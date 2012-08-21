@@ -52,7 +52,6 @@ import prefuse.data.Graph;
 import prefuse.data.Table;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
-import prefuse.data.io.GraphMLReader;
 import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
@@ -127,7 +126,7 @@ public class graphBeta extends JPanel {
 				ColorLib.rgb(190, 190, 255), ColorLib.rgb(255, 255, 0) };
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction("graph.nodes",
-				"affiliation", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+				"label", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
 		// use black for node text
 		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));
@@ -247,7 +246,7 @@ public class graphBeta extends JPanel {
 		// update labeling
 		DefaultRendererFactory drf = (DefaultRendererFactory) m_vis
 				.getRendererFactory();
-		((LabelRenderer) drf.getDefaultRenderer()).setTextField(label);
+		((LabelRenderer) drf.getDefaultRenderer()).setTextField("value");
 
 		// update graph
 		m_vis.removeGroup(graph);
@@ -265,7 +264,7 @@ public class graphBeta extends JPanel {
 		UILib.setPlatformLookAndFeel();
 		
 		// create graphBeta
-		String datafile = "polbooks.xml";
+		String datafile = "polbooks.gml";
 		String label = "label";
 		if (args.length > 1) {
 			datafile = args[0];
@@ -287,7 +286,7 @@ public class graphBeta extends JPanel {
 			label = "label";
 		} else {
 			try {
-				g = new GraphMLReader().readGraph(datafile);
+				g = new gmlReader().readGraph(datafile);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);

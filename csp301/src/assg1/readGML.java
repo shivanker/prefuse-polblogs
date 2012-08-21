@@ -55,7 +55,7 @@ public class readGML {
 					// System.out.println(s1);
 					String[] tokens1 = s1.split("\\s+", 2);
 					// System.out.println(tokens1[0]);
-					System.out.println(tokens1[1]);
+					// System.out.println(tokens1[1]);
 
 					n1.set(tokens1[0], tokens1[1]);
 				}

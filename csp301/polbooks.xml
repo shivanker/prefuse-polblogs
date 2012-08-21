@@ -2,10 +2,9 @@
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns">
 <graph edgedefault="undirected">
 
-
 <!-- data schema -->
 <key id="label" for="node" attr.name="label" attr.type="string"/>
-<key id="value" for="node" attr.name="affiliation" attr.type="string"/>
+<key id="value" for="node" attr.name="value" attr.type="string"/>
 
 <!-- nodes -->
 <node id="0">
@@ -21,7 +20,7 @@
   <data key="value">c</data>
 </node>
 <node id="3">
-  <data key="label">Losing Bin Laden</data>
+  <data key="label">Losnig Bin Laden</data>
   <data key="value">c</data>
 </node>
 <node id="4">
