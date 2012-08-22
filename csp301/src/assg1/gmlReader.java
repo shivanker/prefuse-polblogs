@@ -25,6 +25,8 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 		try {
 			while ((len = is.read(buf, 0, size)) != -1)
 				bos.write(buf, 0, len);
+			is.close();
+			bos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new DataIOException(e);
@@ -32,7 +34,7 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 		buf = bos.toByteArray();
 		String siii = new String(buf).trim();
 		String tokens[] = siii.split("((?<!\"[^\\n]{0,1000})\\s+|\\n+\\s+|\\s+(?![^\\n]*\"))");
-
+		
 		Table nodeData = new Table();
 		Table edgeData = new Table();
 		nodeData.addColumn("id", String.class);
@@ -105,6 +107,8 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 						target = Integer.parseInt(tokens[j + 1]);
 					j += 2;
 				}
+				if (source == 1490 && target == 802)
+					System.out.println("Lets start");
 				Edge e1 = g.getEdge(g.addEdge(source, target));
 
 				while (!tokens[i].equals("]")) {
@@ -122,7 +126,7 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 	}
 
 	public static void main(String... args) throws DataIOException {
-		String location = "polbooks.gml";
+		String location = "polblogs.gml";
 		try {
 			InputStream is = IOLib.streamFromString(location);
 			if (is == null)
