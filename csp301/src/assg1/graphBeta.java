@@ -68,9 +68,6 @@ import prefuse.util.ui.UILib;
 import prefuse.visual.VisualGraph;
 import prefuse.visual.VisualItem;
 
-/**
- * @author <a href="http://jheer.org">jeffrey heer</a>
- */
 public class graphBeta extends JPanel {
 
 	private static final String graph = "graph";
