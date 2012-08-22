@@ -126,7 +126,7 @@ public class graphBeta extends JPanel {
 				ColorLib.rgb(190, 190, 255), ColorLib.rgb(255, 255, 0) };
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction("graph.nodes",
-				"label", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+				"value", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
 		// use black for node text
 		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));
