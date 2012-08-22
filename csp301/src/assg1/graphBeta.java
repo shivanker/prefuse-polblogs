@@ -50,6 +50,7 @@ import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
 import prefuse.data.Graph;
 import prefuse.data.Table;
+import prefuse.data.Tree;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
 import prefuse.data.tuple.TupleSet;
@@ -124,6 +125,8 @@ public class graphBeta extends JPanel {
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction("graph.nodes",
 				"value", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+		fill.add(VisualItem.FIXED, ColorLib.rgb(255, 100, 100));
+		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgb(255, 200, 125));
 		// use black for node text
 		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));
@@ -136,12 +139,7 @@ public class graphBeta extends JPanel {
 		color.add(fill);
 		color.add(text);
 		color.add(edge);
-		/*
-		ColorAction fill = new ColorAction(nodes, VisualItem.FILLCOLOR,
-				ColorLib.rgb(200, 200, 255));
-		fill.add(VisualItem.FIXED, ColorLib.rgb(255, 100, 100));
-		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgb(255, 200, 125));
-*/
+		
 		ActionList draw = new ActionList();
 		draw.add(filter);
 		draw.add(fill);
@@ -185,7 +183,7 @@ public class graphBeta extends JPanel {
 		display.addControlListener(new NeighborHighlightControl());
 
 		// overview display
-		// Display overview = new Display(vis);
+		// Display overview = new Display(m_vis);
 		// overview.setSize(290,290);
 		// overview.addItemBoundsListener(new FitOverviewListener());
 
