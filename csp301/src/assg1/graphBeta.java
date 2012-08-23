@@ -192,9 +192,9 @@ public class graphBeta extends JPanel {
 		display.addControlListener(new NeighborHighlightControl());
 
 		// overview display
-		// Display overview = new Display(m_vis);
-		// overview.setSize(290,290);
-		// overview.addItemBoundsListener(new FitOverviewListener());
+		Display overview = new Display(m_vis);
+		overview.setSize(290,290);
+		overview.addItemBoundsListener(new FitOverviewListener());
 
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.WHITE);
@@ -253,9 +253,10 @@ public class graphBeta extends JPanel {
         Box box = UILib.getBox(new Component[]{title,search}, false, 10, 3, 0);
         box.setBorder(BorderFactory.createTitledBorder("Label"));
         box.setMaximumSize(new Dimension(300,60));
-        
+
 		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
+		fpanel.add(overview);
 
 		// create a new JSplitPane to present the interface
 		JSplitPane split = new JSplitPane();
