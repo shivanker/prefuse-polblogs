@@ -4,8 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
@@ -26,6 +28,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -41,6 +45,7 @@ import prefuse.action.assignment.DataColorAction;
 import prefuse.action.filter.GraphDistanceFilter;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
+import prefuse.controls.ControlAdapter;
 import prefuse.controls.DragControl;
 import prefuse.controls.FocusControl;
 import prefuse.controls.NeighborHighlightControl;
@@ -57,21 +62,20 @@ import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
+import prefuse.util.FontLib;
 import prefuse.util.GraphLib;
 import prefuse.util.GraphicsLib;
 import prefuse.util.display.DisplayLib;
 import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.io.IOLib;
+import prefuse.util.ui.JFastLabel;
 import prefuse.util.ui.JForcePanel;
 import prefuse.util.ui.JValueSlider;
 import prefuse.util.ui.UILib;
 import prefuse.visual.VisualGraph;
 import prefuse.visual.VisualItem;
 
-/**
- * @author <a href="http://jheer.org">jeffrey heer</a>
- */
 public class graphBeta extends JPanel {
 
 	private static final String graph = "graph";
@@ -195,16 +199,11 @@ public class graphBeta extends JPanel {
 
 		// --------------------------------------------------------------------
 		// launch the visualization
-
+        
 		// create a panel for editing force values
 		ForceSimulator fsim = ((ForceDirectedLayout) animate.get(0))
 				.getForceSimulator();
 		JForcePanel fpanel = new JForcePanel(fsim);
-
-		// JPanel opanel = new JPanel();
-		// opanel.setBorder(BorderFactory.createTitledBorder("Overview"));
-		// opanel.setBackground(Color.WHITE);
-		// opanel.add(overview);
 
 		final JValueSlider slider = new JValueSlider("Distance", 0, hops, hops);
 		slider.addChangeListener(new ChangeListener() {
@@ -222,8 +221,31 @@ public class graphBeta extends JPanel {
 		cf.setBorder(BorderFactory.createTitledBorder("Connectivity Filter"));
 		fpanel.add(cf);
 
-		// fpanel.add(opanel);
-
+		final JFastLabel title = new JFastLabel("                 ");
+        title.setPreferredSize(new Dimension(300, 30));
+        title.setMaximumSize(new Dimension(300,30));
+        title.setVerticalAlignment(SwingConstants.BOTTOM);
+        title.setBorder(BorderFactory.createEmptyBorder(2,3,2,0));
+        title.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
+        title.setBackground(Color.WHITE);
+        
+        display.addControlListener(new ControlAdapter() {
+            public void itemEntered(VisualItem item, MouseEvent e) {
+                if ( item.canGetString("label") )
+                    title.setText(item.getString("label"));
+                else
+                	title.setText(":O");
+            }
+            public void itemExited(VisualItem item, MouseEvent e) {
+                title.setText(null);
+            }
+        });
+		
+		Box box = new Box(BoxLayout.Y_AXIS);
+        box.add(title);
+        box.setBorder(BorderFactory.createTitledBorder("Label"));
+        
+		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
 
 		// create a new JSplitPane to present the interface
