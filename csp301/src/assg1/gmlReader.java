@@ -15,7 +15,6 @@ import prefuse.util.io.IOLib;
 
 public class gmlReader extends AbstractGraphReader implements GraphReader {
 
-	@Override
 	public Graph readGraph(InputStream is) throws DataIOException {
 
 		int size = 1024, len;
@@ -34,7 +33,7 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 		buf = bos.toByteArray();
 		String siii = new String(buf).trim();
 		String tokens[] = siii.split("((?<!\"[^\\n]{0,1000})\\s+|\\n+\\s+|\\s+(?![^\\n]*\"))");
-		
+
 		Table nodeData = new Table();
 		Table edgeData = new Table();
 		nodeData.addColumn("id", String.class);

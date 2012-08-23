@@ -156,16 +156,19 @@ public class graphBeta extends JPanel {
         
 		SearchTupleSet searchset = new PrefixSearchTupleSet();
         m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchset);		
-		
+
 		ActionList draw = new ActionList();
 		draw.add(filter);
 		draw.add(fill);
 		draw.add(text);
 		draw.add(new ColorAction(nodes, VisualItem.STROKECOLOR, 0));
-		draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0, 0, 0)));
-		draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib.gray(200)));
-		draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib.gray(200)));
-		
+		draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0,
+				0, 0)));
+		draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib
+				.gray(200)));
+		draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib
+				.gray(200)));
+
 		ForceSimulator fsim = new ForceSimulator();
 		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
 		fsim.addForce(new SpringForce());
@@ -213,7 +216,7 @@ public class graphBeta extends JPanel {
 
 		// --------------------------------------------------------------------
 		// launch the visualization
-        
+
 		// create a panel for editing force values
 		JForcePanel fpanel = new JForcePanel(fsim);
 
@@ -232,37 +235,47 @@ public class graphBeta extends JPanel {
 		cf.add(slider);
 		cf.setBorder(BorderFactory.createTitledBorder("Connectivity Filter"));
 		fpanel.add(cf);
-		
+
 		JSearchPanel search = new JSearchPanel(m_vis, nodes, "label", true, true);
-        search.setShowResultCount(true);
-        search.setBorder(BorderFactory.createEmptyBorder(5,5,4,0));
-        search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
-        search.setPreferredSize(new Dimension(300, 30));
-        search.setMaximumSize(new Dimension(300, 30));
-        
+		search.setShowResultCount(true);
+		search.setBorder(BorderFactory.createEmptyBorder(5,5,4,0));
+		search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
+		search.setPreferredSize(new Dimension(300, 30));
+		search.setMaximumSize(new Dimension(300, 30));
+
+		/*SearchTupleSet s = new PrefixSearchTupleSet();
+        m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, s);
+        s.addTupleSetListener(new TupleSetListener() {
+            public void tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
+                m_vis.cancel("animatePaint");
+                m_vis.run("recolor");
+                m_vis.run("animatePaint");
+            }
+        });*/
+
 		final JFastLabel title = new JFastLabel(" ");
-        title.setPreferredSize(new Dimension(300, 30));
-        title.setMaximumSize(new Dimension(300,30));
-        title.setVerticalAlignment(SwingConstants.TOP);
-        title.setBorder(BorderFactory.createEmptyBorder(3,0,0,0));
-        title.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
-        title.setBackground(Color.WHITE);
-        
-        display.addControlListener(new ControlAdapter() {
-            public void itemEntered(VisualItem item, MouseEvent e) {
-                if ( item.canGetString("label") )
-                    title.setText(item.getString("label"));
-                else
-                	title.setText(":O");
-            }
-            public void itemExited(VisualItem item, MouseEvent e) {
-                title.setText(null);
-            }
-        });
-		
-        Box box = UILib.getBox(new Component[]{title,search}, false, 10, 3, 0);
-        box.setBorder(BorderFactory.createTitledBorder("Label"));
-        box.setMaximumSize(new Dimension(310,60));
+		title.setPreferredSize(new Dimension(300, 30));
+		title.setMaximumSize(new Dimension(300,30));
+		title.setVerticalAlignment(SwingConstants.TOP);
+		title.setBorder(BorderFactory.createEmptyBorder(3,0,0,0));
+		title.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
+		title.setBackground(Color.WHITE);
+
+		display.addControlListener(new ControlAdapter() {
+			public void itemEntered(VisualItem item, MouseEvent e) {
+				if ( item.canGetString("label") )
+					title.setText(item.getString("label"));
+				else
+					title.setText(":O");
+			}
+			public void itemExited(VisualItem item, MouseEvent e) {
+				title.setText(null);
+			}
+		});
+
+		Box box = UILib.getBox(new Component[]{title,search}, false, 10, 3, 0);
+		box.setBorder(BorderFactory.createTitledBorder("Label"));
+		box.setMaximumSize(new Dimension(310,60));
 
 		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
@@ -290,7 +303,7 @@ public class graphBeta extends JPanel {
 		((LabelRenderer) drf.getDefaultRenderer()).setHorizontalPadding(5);
 		((LabelRenderer) drf.getDefaultRenderer()).setHorizontalAlignment(Constants.CENTER);
 		((LabelRenderer) drf.getDefaultRenderer()).setVerticalAlignment(Constants.CENTER);
-		
+
 		// update graph
 		m_vis.removeGroup(graph);
 		VisualGraph vg = m_vis.addGraph(graph, g);
@@ -305,7 +318,7 @@ public class graphBeta extends JPanel {
 
 	public static void main(String[] args) {
 		UILib.setPlatformLookAndFeel();
-		
+
 		// create graphBeta
 		String datafile = "polbooks.gml";
 		String label = "label";
@@ -348,7 +361,7 @@ public class graphBeta extends JPanel {
 		menubar.add(dataMenu);
 
 		// launch window
-		JFrame frame = new JFrame("p r e f u s e  |  g r a p h v i e w");
+		JFrame frame = new JFrame("c s p 3 0 1  |  a s s i g n m e n t 1");
 		frame.setJMenuBar(menubar);
 		frame.setContentPane(view);
 		frame.pack();
