@@ -71,6 +71,7 @@ import prefuse.util.force.ForceSimulator;
 import prefuse.util.io.IOLib;
 import prefuse.util.ui.JFastLabel;
 import prefuse.util.ui.JForcePanel;
+import prefuse.util.ui.JSearchPanel;
 import prefuse.util.ui.JValueSlider;
 import prefuse.util.ui.UILib;
 import prefuse.visual.VisualGraph;
@@ -220,12 +221,17 @@ public class graphBeta extends JPanel {
 		cf.add(slider);
 		cf.setBorder(BorderFactory.createTitledBorder("Connectivity Filter"));
 		fpanel.add(cf);
+		
+		JSearchPanel search = new JSearchPanel(m_vis, nodes, "label", true, true);
+        search.setShowResultCount(true);
+        search.setBorder(BorderFactory.createEmptyBorder(5,5,4,0));
+        search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
 
-		final JFastLabel title = new JFastLabel("                 ");
+		final JFastLabel title = new JFastLabel(" ");
         title.setPreferredSize(new Dimension(300, 30));
         title.setMaximumSize(new Dimension(300,30));
-        title.setVerticalAlignment(SwingConstants.BOTTOM);
-        title.setBorder(BorderFactory.createEmptyBorder(2,3,2,0));
+        title.setVerticalAlignment(SwingConstants.TOP);
+        title.setBorder(BorderFactory.createEmptyBorder(3,0,0,0));
         title.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
         title.setBackground(Color.WHITE);
         
@@ -241,9 +247,12 @@ public class graphBeta extends JPanel {
             }
         });
 		
-		Box box = new Box(BoxLayout.Y_AXIS);
-        box.add(title);
+        Box box = UILib.getBox(new Component[]{title,search}, false, 10, 3, 0);
         box.setBorder(BorderFactory.createTitledBorder("Label"));
+        
+//		Box box = new Box(BoxLayout.Y_AXIS);
+//        box.add(title);
+//        box.setBorder(BorderFactory.createTitledBorder("Label"));
         
 		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
