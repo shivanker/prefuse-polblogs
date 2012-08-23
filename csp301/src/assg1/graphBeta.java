@@ -94,7 +94,7 @@ public class graphBeta extends JPanel {
 		// set up the renderers
 
 		LabelRenderer tr = new LabelRenderer();
-		tr.setRoundedCorner(8, 8);
+		tr.setRoundedCorner(20, 20);
 		m_vis.setRendererFactory(new DefaultRendererFactory(tr));
 
 		// --------------------------------------------------------------------
@@ -132,8 +132,8 @@ public class graphBeta extends JPanel {
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction("graph.nodes",
 				"value", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		fill.add(VisualItem.FIXED, ColorLib.rgb(255, 100, 100));
-		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgb(255, 200, 125));
+		fill.add(VisualItem.FIXED, ColorLib.rgba(255, 0, 0, 200));
+		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgba(0, 0, 255, 200));
 		// use black for node text
 		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));
@@ -267,7 +267,10 @@ public class graphBeta extends JPanel {
 		DefaultRendererFactory drf = (DefaultRendererFactory) m_vis
 				.getRendererFactory();
 		((LabelRenderer) drf.getDefaultRenderer()).setTextField("value");
-
+		((LabelRenderer) drf.getDefaultRenderer()).setHorizontalPadding(5);
+		((LabelRenderer) drf.getDefaultRenderer()).setHorizontalAlignment(Constants.CENTER);
+		((LabelRenderer) drf.getDefaultRenderer()).setVerticalAlignment(Constants.CENTER);
+		
 		// update graph
 		m_vis.removeGroup(graph);
 		VisualGraph vg = m_vis.addGraph(graph, g);
