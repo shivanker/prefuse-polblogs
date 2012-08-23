@@ -56,6 +56,8 @@ import prefuse.data.Graph;
 import prefuse.data.Table;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
+import prefuse.data.search.PrefixSearchTupleSet;
+import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
@@ -122,7 +124,8 @@ public class graphBeta extends JPanel {
 				m_vis.run("draw");
 			}
 		});
-
+		
+		
 		// --------------------------------------------------------------------
 		// create actions to process the visual data
 
@@ -130,15 +133,17 @@ public class graphBeta extends JPanel {
 		final GraphDistanceFilter filter = new GraphDistanceFilter(graph, hops);
 
 		int[] palette = new int[] { ColorLib.rgb(255, 180, 180),
-				ColorLib.rgb(190, 190, 255), ColorLib.rgb(255, 255, 0) };
+				ColorLib.rgb(190, 190, 255), ColorLib.rgba(255, 255, 0, 150) };
 		// map nominal data values to colors using our provided palette
-		DataColorAction fill = new DataColorAction("graph.nodes",
+		DataColorAction fill = new DataColorAction(nodes,
 				"value", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
 		fill.add(VisualItem.FIXED, ColorLib.rgba(255, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgba(0, 0, 255, 200));
+		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
 		// use black for node text
 		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));
+		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
 		// use light grey for edges
 		ColorAction edge = new ColorAction("graph.edges",
 				VisualItem.STROKECOLOR, ColorLib.gray(200));
@@ -148,17 +153,18 @@ public class graphBeta extends JPanel {
 		color.add(fill);
 		color.add(text);
 		color.add(edge);
+        
+		SearchTupleSet searchset = new PrefixSearchTupleSet();
+        m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchset);		
 		
 		ActionList draw = new ActionList();
 		draw.add(filter);
 		draw.add(fill);
+		draw.add(text);
 		draw.add(new ColorAction(nodes, VisualItem.STROKECOLOR, 0));
-		draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0,
-				0, 0)));
-		draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib
-				.gray(200)));
-		draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib
-				.gray(200)));
+		draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0, 0, 0)));
+		draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib.gray(200)));
+		draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib.gray(200)));
 		
 		ForceSimulator fsim = new ForceSimulator();
 		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
@@ -168,6 +174,7 @@ public class graphBeta extends JPanel {
 		ActionList animate = new ActionList(Activity.INFINITY);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(fill);
+		animate.add(text);
 		animate.add(new RepaintAction());
 
 		// finally, we register our ActionList with the Visualization.
