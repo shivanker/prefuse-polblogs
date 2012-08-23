@@ -30,6 +30,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -226,7 +227,9 @@ public class graphBeta extends JPanel {
         search.setShowResultCount(true);
         search.setBorder(BorderFactory.createEmptyBorder(5,5,4,0));
         search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
-
+        search.setPreferredSize(new Dimension(300, 30));
+        search.setMaximumSize(new Dimension(300, 30));
+        
 		final JFastLabel title = new JFastLabel(" ");
         title.setPreferredSize(new Dimension(300, 30));
         title.setMaximumSize(new Dimension(300,30));
@@ -249,10 +252,7 @@ public class graphBeta extends JPanel {
 		
         Box box = UILib.getBox(new Component[]{title,search}, false, 10, 3, 0);
         box.setBorder(BorderFactory.createTitledBorder("Label"));
-        
-//		Box box = new Box(BoxLayout.Y_AXIS);
-//        box.add(title);
-//        box.setBorder(BorderFactory.createTitledBorder("Label"));
+        box.setMaximumSize(new Dimension(300,60));
         
 		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
