@@ -103,7 +103,6 @@ public class graphBeta extends JPanel {
 
 		// --------------------------------------------------------------------
 		// register the data with a visualization
-
 		// adds graph to visualization and sets renderer label field
 		setGraph(g, label);
 
