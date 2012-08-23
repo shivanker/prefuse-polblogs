@@ -29,8 +29,6 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -56,7 +54,6 @@ import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
 import prefuse.data.Graph;
 import prefuse.data.Table;
-import prefuse.data.Tree;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
 import prefuse.data.tuple.TupleSet;
@@ -68,7 +65,10 @@ import prefuse.util.GraphLib;
 import prefuse.util.GraphicsLib;
 import prefuse.util.display.DisplayLib;
 import prefuse.util.display.ItemBoundsListener;
+import prefuse.util.force.DragForce;
 import prefuse.util.force.ForceSimulator;
+import prefuse.util.force.NBodyForce;
+import prefuse.util.force.SpringForce;
 import prefuse.util.io.IOLib;
 import prefuse.util.ui.JFastLabel;
 import prefuse.util.ui.JForcePanel;
@@ -159,9 +159,14 @@ public class graphBeta extends JPanel {
 				.gray(200)));
 		draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib
 				.gray(200)));
+		
+		ForceSimulator fsim = new ForceSimulator();
+		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
+		fsim.addForce(new SpringForce());
+		fsim.addForce(new DragForce());
 
 		ActionList animate = new ActionList(Activity.INFINITY);
-		animate.add(new ForceDirectedLayout(graph));
+		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(fill);
 		animate.add(new RepaintAction());
 
@@ -203,8 +208,6 @@ public class graphBeta extends JPanel {
 		// launch the visualization
         
 		// create a panel for editing force values
-		ForceSimulator fsim = ((ForceDirectedLayout) animate.get(0))
-				.getForceSimulator();
 		JForcePanel fpanel = new JForcePanel(fsim);
 
 		final JValueSlider slider = new JValueSlider("Distance", 0, hops, hops);
@@ -252,7 +255,7 @@ public class graphBeta extends JPanel {
 		
         Box box = UILib.getBox(new Component[]{title,search}, false, 10, 3, 0);
         box.setBorder(BorderFactory.createTitledBorder("Label"));
-        box.setMaximumSize(new Dimension(300,60));
+        box.setMaximumSize(new Dimension(310,60));
 
 		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
