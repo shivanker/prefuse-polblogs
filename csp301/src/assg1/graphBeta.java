@@ -5,34 +5,22 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import prefuse.Constants;
 import prefuse.Display;
@@ -53,19 +41,16 @@ import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
 import prefuse.data.Graph;
-import prefuse.data.Table;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
 import prefuse.data.io.GraphMLReader;
 import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.TupleSet;
+import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.DefaultRendererFactory;
-import prefuse.render.LabelRenderer;
-import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
-import prefuse.util.GraphLib;
 import prefuse.util.GraphicsLib;
 import prefuse.util.display.DisplayLib;
 import prefuse.util.display.ItemBoundsListener;
@@ -73,12 +58,12 @@ import prefuse.util.force.DragForce;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
 import prefuse.util.force.SpringForce;
-import prefuse.util.io.IOLib;
 import prefuse.util.ui.JFastLabel;
 import prefuse.util.ui.JForcePanel;
 import prefuse.util.ui.JSearchPanel;
 import prefuse.util.ui.JValueSlider;
 import prefuse.util.ui.UILib;
+import prefuse.visual.NodeItem;
 import prefuse.visual.VisualGraph;
 import prefuse.visual.VisualItem;
 
@@ -99,10 +84,11 @@ public class graphBeta extends JPanel {
 		// --------------------------------------------------------------------
 		// set up the renderers
 
-		ShapeRenderer sr = new ShapeRenderer();
-		LabelRenderer tr = new LabelRenderer();
-		tr.setRoundedCorner(20, 20);
-		m_vis.setRendererFactory(new DefaultRendererFactory(tr));
+		// ShapeRenderer sr = new ShapeRenderer();
+		nodeRenderer nr = new nodeRenderer();
+		// LabelRenderer tr = new LabelRenderer();
+		// tr.setRoundedCorner(20, 20);
+		m_vis.setRendererFactory(new DefaultRendererFactory(nr));
 
 		// --------------------------------------------------------------------
 		// register the data with a visualization
@@ -126,8 +112,7 @@ public class graphBeta extends JPanel {
 				m_vis.run("draw");
 			}
 		});
-		
-		
+
 		// --------------------------------------------------------------------
 		// create actions to process the visual data
 
@@ -137,13 +122,13 @@ public class graphBeta extends JPanel {
 		int[] palette = new int[] { ColorLib.rgb(255, 180, 180),
 				ColorLib.rgb(190, 190, 255), ColorLib.rgba(255, 255, 0, 150) };
 		// map nominal data values to colors using our provided palette
-		DataColorAction fill = new DataColorAction(nodes,
-				"value", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		
+		DataColorAction fill = new DataColorAction(nodes, "value",
+				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+
 		fill.add(VisualItem.FIXED, ColorLib.rgba(255, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgba(0, 0, 255, 200));
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
-		
+
 		// use black for node text
 		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));
@@ -157,9 +142,9 @@ public class graphBeta extends JPanel {
 		color.add(fill);
 		color.add(text);
 		color.add(edge);
-        
+
 		SearchTupleSet searchset = new PrefixSearchTupleSet();
-        m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchset);		
+		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchset);
 
 		ActionList draw = new ActionList();
 		draw.add(filter);
@@ -212,7 +197,7 @@ public class graphBeta extends JPanel {
 
 		// overview display
 		Display overview = new Display(m_vis);
-		overview.setSize(290,290);
+		overview.setSize(290, 290);
 		overview.addItemBoundsListener(new FitOverviewListener());
 
 		display.setForeground(Color.GRAY);
@@ -240,46 +225,66 @@ public class graphBeta extends JPanel {
 		cf.setBorder(BorderFactory.createTitledBorder("Connectivity Filter"));
 		fpanel.add(cf);
 
-		JSearchPanel search = new JSearchPanel(m_vis, nodes, "label", true, true);
+		JSearchPanel search = new JSearchPanel(m_vis, nodes, "label", true,
+				true);
 		search.setShowResultCount(true);
-		search.setBorder(BorderFactory.createEmptyBorder(5,5,4,0));
+		search.setBorder(BorderFactory.createEmptyBorder(5, 5, 4, 0));
 		search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
 		search.setPreferredSize(new Dimension(300, 30));
 		search.setMaximumSize(new Dimension(300, 30));
 
-		/*SearchTupleSet s = new PrefixSearchTupleSet();
-        m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, s);
-        s.addTupleSetListener(new TupleSetListener() {
-            public void tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
-                m_vis.cancel("animatePaint");
-                m_vis.run("recolor");
-                m_vis.run("animatePaint");
-            }
-        });*/
+		/*
+		 * SearchTupleSet s = new PrefixSearchTupleSet();
+		 * m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, s);
+		 * s.addTupleSetListener(new TupleSetListener() { public void
+		 * tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
+		 * m_vis.cancel("animatePaint"); m_vis.run("recolor");
+		 * m_vis.run("animatePaint"); } });
+		 */
 
 		final JFastLabel title = new JFastLabel(" ");
 		title.setPreferredSize(new Dimension(300, 30));
-		title.setMaximumSize(new Dimension(300,30));
+		title.setMaximumSize(new Dimension(300, 30));
 		title.setVerticalAlignment(SwingConstants.TOP);
-		title.setBorder(BorderFactory.createEmptyBorder(3,0,0,0));
+		title.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
 		title.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
 		title.setBackground(Color.WHITE);
 
+		final JFastLabel value = new JFastLabel(" ");
+		value.setPreferredSize(new Dimension(300, 30));
+		value.setMaximumSize(new Dimension(300, 30));
+		value.setVerticalAlignment(SwingConstants.TOP);
+		value.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
+		value.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
+		value.setBackground(Color.WHITE);
+
 		display.addControlListener(new ControlAdapter() {
 			public void itemEntered(VisualItem item, MouseEvent e) {
-				if ( item.canGetString("label") )
-					title.setText(item.getString("label"));
-				else
+				if (item instanceof NodeItem) {
+					String label = item.getString("label");
+					String aff = (String) item.get("value");
+					if (aff.equals("c"))
+						aff = "Conservative";
+					else if (aff.equals("n"))
+						aff = "Neutral";
+					else
+						aff = "Liberal";
+					title.setText(label);
+					value.setText("Affiliation: " + aff);
+				} else
 					title.setText(":O");
 			}
+
 			public void itemExited(VisualItem item, MouseEvent e) {
 				title.setText(null);
+				value.setText(null);
 			}
 		});
 
-		Box box = UILib.getBox(new Component[]{title,search}, false, 10, 3, 0);
-		box.setBorder(BorderFactory.createTitledBorder("Label"));
-		box.setMaximumSize(new Dimension(310,60));
+		Box box = UILib.getBox(new Component[] { title, value, search }, false,
+				10, 3, 0);
+		box.setBorder(BorderFactory.createTitledBorder("Node Info"));
+		box.setMaximumSize(new Dimension(310, 90));
 
 		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
@@ -303,10 +308,12 @@ public class graphBeta extends JPanel {
 		// update labeling
 		DefaultRendererFactory drf = (DefaultRendererFactory) m_vis
 				.getRendererFactory();
-		((LabelRenderer) drf.getDefaultRenderer()).setTextField("value");
-		((LabelRenderer) drf.getDefaultRenderer()).setHorizontalPadding(5);
-		((LabelRenderer) drf.getDefaultRenderer()).setHorizontalAlignment(Constants.CENTER);
-		((LabelRenderer) drf.getDefaultRenderer()).setVerticalAlignment(Constants.CENTER);
+		// ((LabelRenderer) drf.getDefaultRenderer()).setTextField("value");
+		// ((LabelRenderer) drf.getDefaultRenderer()).setHorizontalPadding(5);
+		// ((LabelRenderer) drf.getDefaultRenderer())
+		// .setHorizontalAlignment(Constants.CENTER);
+		// ((LabelRenderer) drf.getDefaultRenderer())
+		// .setVerticalAlignment(Constants.CENTER);
 
 		// update graph
 		m_vis.removeGroup(graph);
@@ -341,32 +348,21 @@ public class graphBeta extends JPanel {
 
 	public static JFrame demo(String datafile, String label) {
 		Graph g = null;
-		if (datafile == null) {
-			g = GraphLib.getGrid(15, 15);
-			label = "label";
-		} else {
-			try {
-				g = new GraphMLReader().readGraph(datafile);
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+		try {
+			g = new GraphMLReader().readGraph(datafile);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
+
 		return demo(g, label);
 	}
 
 	public static JFrame demo(Graph g, String label) {
 		final graphBeta view = new graphBeta(g, label);
 
-		// set up menu
-		JMenu dataMenu = new JMenu("Data");
-		dataMenu.add(new OpenGraphAction(view));
-		JMenuBar menubar = new JMenuBar();
-		menubar.add(dataMenu);
-
 		// launch window
-		JFrame frame = new JFrame("c s p 3 0 1  |  a s s i g n m e n t 1");
-		frame.setJMenuBar(menubar);
+		JFrame frame = new JFrame("c s p 3 0 1  |  a s s i g n m e n t 1 | p o l b o o k s");
 		frame.setContentPane(view);
 		frame.pack();
 		frame.setVisible(true);
@@ -382,132 +378,6 @@ public class graphBeta extends JPanel {
 		});
 
 		return frame;
-	}
-
-	// ------------------------------------------------------------------------
-
-	/**
-	 * Swing menu action that loads a graph into the graph viewer.
-	 */
-	public abstract static class GraphMenuAction extends AbstractAction {
-		private graphBeta m_view;
-
-		public GraphMenuAction(String name, String accel, graphBeta view) {
-			m_view = view;
-			this.putValue(AbstractAction.NAME, name);
-			this.putValue(AbstractAction.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(accel));
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			m_view.setGraph(getGraph(), "label");
-		}
-
-		protected abstract Graph getGraph();
-	}
-
-	public static class OpenGraphAction extends AbstractAction {
-		private graphBeta m_view;
-
-		public OpenGraphAction(graphBeta view) {
-			m_view = view;
-			this.putValue(AbstractAction.NAME, "Open File...");
-			this.putValue(AbstractAction.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke("ctrl O"));
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			Graph g = IOLib.getGraphFile(m_view);
-			if (g == null)
-				return;
-			String label = getLabel(m_view, g);
-			if (label != null) {
-				m_view.setGraph(g, label);
-			}
-		}
-
-		public static String getLabel(Component c, Graph g) {
-			// get the column names
-			Table t = g.getNodeTable();
-			int cc = t.getColumnCount();
-			String[] names = new String[cc];
-			for (int i = 0; i < cc; ++i)
-				names[i] = t.getColumnName(i);
-
-			// where to store the result
-			final String[] label = new String[1];
-
-			// -- build the dialog -----
-			// we need to get the enclosing frame first
-			while (c != null && !(c instanceof JFrame)) {
-				c = c.getParent();
-			}
-			final JDialog dialog = new JDialog((JFrame) c,
-					"Choose Label Field", true);
-
-			// create the ok/cancel buttons
-			final JButton ok = new JButton("OK");
-			ok.setEnabled(false);
-			ok.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					dialog.setVisible(false);
-				}
-			});
-			JButton cancel = new JButton("Cancel");
-			cancel.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					label[0] = null;
-					dialog.setVisible(false);
-				}
-			});
-
-			// build the selection list
-			final JList list = new JList(names);
-			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			list.getSelectionModel().addListSelectionListener(
-					new ListSelectionListener() {
-						public void valueChanged(ListSelectionEvent e) {
-							int sel = list.getSelectedIndex();
-							if (sel >= 0) {
-								ok.setEnabled(true);
-								label[0] = (String) list.getModel()
-										.getElementAt(sel);
-							} else {
-								ok.setEnabled(false);
-								label[0] = null;
-							}
-						}
-					});
-			JScrollPane scrollList = new JScrollPane(list);
-
-			JLabel title = new JLabel("Choose a field to use for node labels:");
-
-			// layout the buttons
-			Box bbox = new Box(BoxLayout.X_AXIS);
-			bbox.add(Box.createHorizontalStrut(5));
-			bbox.add(Box.createHorizontalGlue());
-			bbox.add(ok);
-			bbox.add(Box.createHorizontalStrut(5));
-			bbox.add(cancel);
-			bbox.add(Box.createHorizontalStrut(5));
-
-			// put everything into a panel
-			JPanel panel = new JPanel(new BorderLayout());
-			panel.add(title, BorderLayout.NORTH);
-			panel.add(scrollList, BorderLayout.CENTER);
-			panel.add(bbox, BorderLayout.SOUTH);
-			panel.setBorder(BorderFactory.createEmptyBorder(5, 2, 2, 2));
-
-			// show the dialog
-			dialog.setContentPane(panel);
-			dialog.pack();
-			dialog.setLocationRelativeTo(c);
-			dialog.setVisible(true);
-			dialog.dispose();
-
-			// return the label field selection
-			return label[0];
-		}
 	}
 
 	public static class FitOverviewListener implements ItemBoundsListener {
@@ -532,3 +402,14 @@ public class graphBeta extends JPanel {
 	}
 
 } // end of class graphBeta
+
+class nodeRenderer extends AbstractShapeRenderer {
+	// protected RectangularShape m_box = new Rectangle2D.Double();
+	protected Ellipse2D m_box = new Ellipse2D.Double();
+
+	@Override
+	protected Shape getRawShape(VisualItem item) {
+		m_box.setFrame(item.getX(), item.getY(), 10, 10);
+		return m_box;
+	}
+}
