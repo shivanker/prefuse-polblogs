@@ -62,6 +62,7 @@ import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
+import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
 import prefuse.util.GraphLib;
@@ -98,6 +99,7 @@ public class graphBeta extends JPanel {
 		// --------------------------------------------------------------------
 		// set up the renderers
 
+		ShapeRenderer sr = new ShapeRenderer();
 		LabelRenderer tr = new LabelRenderer();
 		tr.setRoundedCorner(20, 20);
 		m_vis.setRendererFactory(new DefaultRendererFactory(tr));
@@ -137,9 +139,11 @@ public class graphBeta extends JPanel {
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction(nodes,
 				"value", Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+		
 		fill.add(VisualItem.FIXED, ColorLib.rgba(255, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgba(0, 0, 255, 200));
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
+		
 		// use black for node text
 		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));
@@ -320,7 +324,7 @@ public class graphBeta extends JPanel {
 		UILib.setPlatformLookAndFeel();
 
 		// create graphBeta
-		String datafile = "polblogs.xml";
+		String datafile = "polbooks.xml";
 		String label = "label";
 		if (args.length > 1) {
 			datafile = args[0];

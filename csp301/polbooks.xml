@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns">
 <graph edgedefault="undirected">
 
@@ -20,7 +20,7 @@
   <data key="value">c</data>
 </node>
 <node id="3">
-  <data key="label">Losnig Bin Laden</data>
+  <data key="label">Losing Bin Laden</data>
   <data key="value">c</data>
 </node>
 <node id="4">
