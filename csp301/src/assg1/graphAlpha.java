@@ -135,7 +135,7 @@ public class graphAlpha extends JPanel {
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
 		// use light grey for edges
 		ColorAction edge = new ColorAction("graph.edges",
-				VisualItem.STROKECOLOR, ColorLib.gray(200));
+				VisualItem.STROKECOLOR, ColorLib.rgba(1,100,130,100));
 
 		// create an action list containing all color assignments
 		ActionList color = new ActionList();
