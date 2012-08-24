@@ -1,7 +1,9 @@
 package assg1;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 import prefuse.data.Graph;
@@ -80,6 +82,7 @@ public class Analysis
 		}
 		s.push(n);
 	}
+	@SuppressWarnings("unchecked")
 	public static int countTriangles(Graph g)
 	{
 		int c = 0;
@@ -87,15 +90,18 @@ public class Analysis
 		Iterator<Node> nodes = g.nodes();
 		while (nodes.hasNext())
 		{
-			Node temp = nodes.next();
-			Iterator<Node> neighbor = temp.neighbors();
+			Node s = nodes.next();
+			Iterator<Node> neighbor = s.neighbors();
 			while (neighbor.hasNext())
 			{
 				Node t = neighbor.next();
-				if (t.getInt("id") > temp.getInt("id"))
+				if (t.getInt("id") > s.getInt("id"))
 				{
+					Set<Node> intersection = new HashSet((HashSet<Node>) s.get("close"));
+					intersection.retainAll((HashSet<Node>) t.get("close"));
+					c+=intersection.size();
+					((HashSet<Node>)t.get("close")).add(s);
 				}
-				
 			}	
 		}
 		return c;
