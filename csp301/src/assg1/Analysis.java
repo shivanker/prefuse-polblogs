@@ -117,4 +117,8 @@ public class Analysis
 		}
 		return sameEdge;
 	}
+	public static long nC3 (int n)
+	{
+		return ((long)n*(n-1)*(n-2))/6;
+	}
 }
