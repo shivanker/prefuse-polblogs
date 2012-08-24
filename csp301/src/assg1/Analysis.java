@@ -1,6 +1,7 @@
 package assg1;
 
 import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Stack;
 
 import prefuse.data.Graph;
@@ -41,8 +42,8 @@ public class Analysis
 	}
 	public static void setSCC(Graph g)
 	{
-		g.addColumn("explored", boolean.class);
-		g.addColumn("exploredRev", boolean.class);
+		g.addColumn("explored", boolean.class, false);
+		g.addColumn("exploredRev", boolean.class, false);
 		g.addColumn("leader", int.class);
 		for (int i = g.getNodeCount()-1; i>=0; i--)
 			if (!g.getNode(i).getBoolean("exploredRev"))
@@ -78,5 +79,25 @@ public class Analysis
 				DFSRev(temp);
 		}
 		s.push(n);
+	}
+	public static int countTriangles(Graph g)
+	{
+		int c = 0;
+		g.addColumn("close", HashSet.class, null);
+		Iterator<Node> nodes = g.nodes();
+		while (nodes.hasNext())
+		{
+			Node temp = nodes.next();
+			Iterator<Node> neighbor = temp.neighbors();
+			while (neighbor.hasNext())
+			{
+				Node t = neighbor.next();
+				if (t.getInt("id") > temp.getInt("id"))
+				{
+				}
+				
+			}	
+		}
+		return c;
 	}
 }
