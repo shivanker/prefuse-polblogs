@@ -161,7 +161,7 @@ public class graphBeta extends JPanel {
 		ForceSimulator fsim = new ForceSimulator();
 		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
 		fsim.addForce(new SpringForce());
-		fsim.addForce(new DragForce());
+		fsim.addForce(new DragForce(0.015f));
 
 		ActionList animate = new ActionList(Activity.INFINITY);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
