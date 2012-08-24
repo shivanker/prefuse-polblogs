@@ -56,6 +56,7 @@ import prefuse.data.Graph;
 import prefuse.data.Table;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
+import prefuse.data.io.GraphMLReader;
 import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.TupleSet;
@@ -319,7 +320,7 @@ public class graphBeta extends JPanel {
 		UILib.setPlatformLookAndFeel();
 
 		// create graphBeta
-		String datafile = "polbooks.gml";
+		String datafile = "polblogs.xml";
 		String label = "label";
 		if (args.length > 1) {
 			datafile = args[0];
@@ -341,7 +342,7 @@ public class graphBeta extends JPanel {
 			label = "label";
 		} else {
 			try {
-				g = new gmlReader().readGraph(datafile);
+				g = new GraphMLReader().readGraph(datafile);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);
