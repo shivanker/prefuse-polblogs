@@ -362,7 +362,8 @@ public class graphBeta extends JPanel {
 		final graphBeta view = new graphBeta(g, label);
 
 		// launch window
-		JFrame frame = new JFrame("c s p 3 0 1  |  a s s i g n m e n t 1 | p o l b o o k s");
+		JFrame frame = new JFrame(
+				"c s p 3 0 1  |  a s s i g n m e n t 1 | p o l b o o k s");
 		frame.setContentPane(view);
 		frame.pack();
 		frame.setVisible(true);
@@ -401,15 +402,14 @@ public class graphBeta extends JPanel {
 		}
 	}
 
-} // end of class graphBeta
+	class nodeRenderer extends AbstractShapeRenderer {
+		// protected RectangularShape m_box = new Rectangle2D.Double();
+		protected Ellipse2D m_box = new Ellipse2D.Double();
 
-class nodeRenderer extends AbstractShapeRenderer {
-	// protected RectangularShape m_box = new Rectangle2D.Double();
-	protected Ellipse2D m_box = new Ellipse2D.Double();
-
-	@Override
-	protected Shape getRawShape(VisualItem item) {
-		m_box.setFrame(item.getX(), item.getY(), 10, 10);
-		return m_box;
+		@Override
+		protected Shape getRawShape(VisualItem item) {
+			m_box.setFrame(item.getX(), item.getY(), 10, 10);
+			return m_box;
+		}
 	}
-}
+} // end of class graphBeta
