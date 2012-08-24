@@ -82,6 +82,7 @@ public class Analysis
 		}
 		s.push(n);
 	}
+	@SuppressWarnings("unchecked")
 	public static int countTriangles(Graph g)
 	{
 		int c = 0;
@@ -98,8 +99,7 @@ public class Analysis
 				{
 					Set<Node> intersection = new HashSet((HashSet<Node>) s.get("close"));
 					intersection.retainAll((HashSet<Node>) t.get("close"));
-					for (Node v:intersection)
-						c++;
+					c+=intersection.size();
 					((HashSet<Node>)t.get("close")).add(s);
 				}
 			}	
