@@ -9,7 +9,6 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.BorderFactory;
@@ -27,11 +26,13 @@ import prefuse.Display;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
+import prefuse.action.animate.ColorAnimator;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.DataColorAction;
 import prefuse.action.filter.GraphDistanceFilter;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
+import prefuse.activity.SlowInSlowOutPacer;
 import prefuse.controls.ControlAdapter;
 import prefuse.controls.DragControl;
 import prefuse.controls.FocusControl;
@@ -47,8 +48,8 @@ import prefuse.data.io.GraphMLReader;
 import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.TupleSet;
-import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.DefaultRendererFactory;
+import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
 import prefuse.util.GraphicsLib;
@@ -121,12 +122,15 @@ public class graphBeta extends JPanel {
 
 		int[] palette = new int[] { ColorLib.rgb(255, 180, 180),
 				ColorLib.rgb(190, 190, 255), ColorLib.rgba(255, 255, 0, 150) };
+		int[] palette2 = new int[] { ColorLib.rgb(255, 180, 180),
+				ColorLib.rgb(190, 190, 255), ColorLib.rgba(255, 255, 0, 150) };
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction(nodes, "value",
 				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-
+		DataColorAction fill2 = new DataColorAction(nodes, "value",
+				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
 		fill.add(VisualItem.FIXED, ColorLib.rgba(255, 0, 0, 200));
-		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgba(0, 0, 255, 200));
+		fill.add(VisualItem.HIGHLIGHT, fill2);
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
 
 		// use black for node text
@@ -143,9 +147,22 @@ public class graphBeta extends JPanel {
 		color.add(text);
 		color.add(edge);
 
-		SearchTupleSet searchset = new PrefixSearchTupleSet();
-		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchset);
+		// animate paint change
+		ActionList animatePaint = new ActionList(1000);
+		animatePaint.add(new ColorAnimator(nodes));
+		animatePaint.add(new RepaintAction());
+		m_vis.putAction("animatePaint", animatePaint);
 
+		SearchTupleSet s = new PrefixSearchTupleSet();
+		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, s);
+		s.addTupleSetListener(new TupleSetListener() {
+			public void tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
+				m_vis.cancel("animatePaint");
+				m_vis.run("fill");
+				m_vis.run("animatePaint");
+			}
+		});
+		
 		ActionList draw = new ActionList();
 		draw.add(filter);
 		draw.add(fill);
@@ -232,15 +249,6 @@ public class graphBeta extends JPanel {
 		search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
 		search.setPreferredSize(new Dimension(300, 30));
 		search.setMaximumSize(new Dimension(300, 30));
-
-		/*
-		 * SearchTupleSet s = new PrefixSearchTupleSet();
-		 * m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, s);
-		 * s.addTupleSetListener(new TupleSetListener() { public void
-		 * tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
-		 * m_vis.cancel("animatePaint"); m_vis.run("recolor");
-		 * m_vis.run("animatePaint"); } });
-		 */
 
 		final JFastLabel title = new JFastLabel(" ");
 		title.setPreferredSize(new Dimension(300, 30));
@@ -402,14 +410,61 @@ public class graphBeta extends JPanel {
 		}
 	}
 
-	class nodeRenderer extends AbstractShapeRenderer {
-		// protected RectangularShape m_box = new Rectangle2D.Double();
-		protected Ellipse2D m_box = new Ellipse2D.Double();
+	class nodeRenderer extends ShapeRenderer {
 
 		@Override
 		protected Shape getRawShape(VisualItem item) {
-			m_box.setFrame(item.getX(), item.getY(), 10, 10);
-			return m_box;
+			double x = item.getX();
+			if (Double.isNaN(x) || Double.isInfinite(x))
+				x = 0;
+			double y = item.getY();
+			if (Double.isNaN(y) || Double.isInfinite(y))
+				y = 0;
+			double width = getBaseSize() * item.getSize();
+
+			// Center the shape around the specified x and y
+			if (width > 1) {
+				x = x - width / 2;
+				y = y - width / 2;
+			}
+
+			if (!item.canGet("value", String.class))
+				return ellipse(x, y, width, width);
+			String v = (String) item.get("value");
+			if (v.equals("c"))
+				return rectangle(x, y, width, width);
+			else if (v.equals("n"))
+				return triangle_down((float) x, (float) y, (float) width);
+			else
+				return ellipse(x, y, width, width);
+
+			// switch ( stype ) {
+			// case Constants.SHAPE_NONE:
+			// return null;
+			// case Constants.SHAPE_RECTANGLE:
+			// return rectangle(x, y, width, width);
+			// case Constants.SHAPE_ELLIPSE:
+			// return ellipse(x, y, width, width);
+			// case Constants.SHAPE_TRIANGLE_UP:
+			// return triangle_up((float)x, (float)y, (float)width);
+			// case Constants.SHAPE_TRIANGLE_DOWN:
+			// return triangle_down((float)x, (float)y, (float)width);
+			// case Constants.SHAPE_TRIANGLE_LEFT:
+			// return triangle_left((float)x, (float)y, (float)width);
+			// case Constants.SHAPE_TRIANGLE_RIGHT:
+			// return triangle_right((float)x, (float)y, (float)width);
+			// case Constants.SHAPE_CROSS:
+			// return cross((float)x, (float)y, (float)width);
+			// case Constants.SHAPE_STAR:
+			// return star((float)x, (float)y, (float)width);
+			// case Constants.SHAPE_HEXAGON:
+			// return hexagon((float)x, (float)y, (float)width);
+			// case Constants.SHAPE_DIAMOND:
+			// return diamond((float)x, (float)y, (float)width);
+			// default:
+			// throw new IllegalStateException("Unknown shape type: "+stype);
+			// }
 		}
+
 	}
 } // end of class graphBeta
