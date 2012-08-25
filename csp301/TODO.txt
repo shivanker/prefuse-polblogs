@@ -1,8 +1,8 @@
 1. Edge Render //Abhishek
-2. Min CUT	// Shivanker
-3. Clustering Coefficient //Akhil
-4. SCC		//Akhil + Shivanker
+2. MinCut //Shivanker 			  (CUT)
+3. Clustering Coefficient //Akhil (DONE)
+4. SCC		//Shivanker
 5. Polblogs colors fix //Abhishek (DONE)
 6. Report	//Abhishek
 7. Default Full Screen //Abhishek (DONE)
-8.
+8. Directed Analysis //Akhil
