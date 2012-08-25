@@ -1,0 +1,7 @@
+1. Edge Render //Abhishek
+2. Min CUT	// Shivanker
+3. Clustering Coefficient //Akhil
+4. SCC		//Akhil + Shivanker
+5. Polblogs colors fix //Abhishek
+6. Report	//Abhishek
+7. 
