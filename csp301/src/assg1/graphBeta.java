@@ -32,11 +32,13 @@ import prefuse.action.assignment.DataColorAction;
 import prefuse.action.filter.GraphDistanceFilter;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
+import prefuse.controls.Control;
 import prefuse.controls.ControlAdapter;
 import prefuse.controls.DragControl;
 import prefuse.controls.FocusControl;
 import prefuse.controls.NeighborHighlightControl;
 import prefuse.controls.PanControl;
+import prefuse.controls.ToolTipControl;
 import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
@@ -119,45 +121,49 @@ public class graphBeta extends JPanel {
 		int hops = 30;
 		final GraphDistanceFilter filter = new GraphDistanceFilter(graph, hops);
 
-		int[] palette = new int[] { ColorLib.rgb(255, 180, 180),
-				ColorLib.rgb(190, 190, 255), ColorLib.rgba(255, 255, 0, 150) };
+		int[] palette = new int[] { 
+				ColorLib.rgba(255,200,200,250),
+	            ColorLib.rgba(200,255,200,250),
+	            ColorLib.rgba(200,200,255,250)
+		};
+		
 		// map nominal data values to colors using our provided palette
-		DataColorAction fill = new DataColorAction(nodes, "value",
-				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+		DataColorAction fill = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
 
-		fill.add(VisualItem.FIXED, ColorLib.rgba(255, 0, 0, 200));
-		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgba(0, 0, 255, 200));
+		fill.add(VisualItem.FIXED, ColorLib.rgba(150, 15, 100, 200));
+		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgba(50, 60, 250, 200));
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
-
-		// use black for node text
-		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
-				ColorLib.gray(0));
+		
+		
+		// use white for node text
+		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,ColorLib.gray(0));
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
+		
+		//outlines of nodes
+        ColorAction nStroke = new ColorAction(nodes, VisualItem.STROKECOLOR);
+        nStroke.setDefaultColor(ColorLib.gray(150));
+        nStroke.add("_hover", ColorLib.gray(50));
+        nStroke.add(VisualItem.HIGHLIGHT, ColorLib.gray(50));
+        nStroke.add("ingroup('_search')", ColorLib.gray(50));
+		
 		// use light grey for edges
-		ColorAction edge = new ColorAction("graph.edges",
-				VisualItem.STROKECOLOR, ColorLib.gray(200));
+		ColorAction edge = new ColorAction(edges,VisualItem.STROKECOLOR, ColorLib.gray(225));
+		edge.add("_hover",  ColorLib.gray(50));
 
 		// create an action list containing all color assignments
 		ActionList color = new ActionList();
-		color.add(fill);
-		color.add(text);
-		color.add(edge);
-
+		
 		SearchTupleSet searchset = new PrefixSearchTupleSet();
 		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchset);
 
 		ActionList draw = new ActionList();
+		//draw.add(new ColorAction(nodes, VisualItem.STROKECOLOR, 0));
+		//draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0,0, 0)));
+		//draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib.gray(200)));
 		draw.add(filter);
-		draw.add(fill);
 		draw.add(text);
-		draw.add(new ColorAction(nodes, VisualItem.STROKECOLOR, 0));
-		draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0,
-				0, 0)));
-		draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib
-				.gray(200)));
-		draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib
-				.gray(200)));
-
+		draw.add(new RepaintAction());
+		
 		ForceSimulator fsim = new ForceSimulator();
 		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
 		fsim.addForce(new SpringForce());
@@ -166,7 +172,9 @@ public class graphBeta extends JPanel {
 		ActionList animate = new ActionList(Activity.INFINITY);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(fill);
-		animate.add(text);
+		animate.add(edge);
+		animate.add(text);	
+		animate.add(nStroke);
 		animate.add(new RepaintAction());
 
 		// finally, we register our ActionList with the Visualization.
@@ -175,11 +183,14 @@ public class graphBeta extends JPanel {
 		m_vis.putAction("draw", draw);
 		m_vis.putAction("layout", animate);
 		m_vis.runAfter("draw", "layout");
-		m_vis.putAction("color", color);
+		//m_vis.putAction("color", color);
 
+
+
+		
+		
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
-
 		Display display = new Display(m_vis);
 		display.setSize(700, 700);
 		display.pan(350, 350);
@@ -402,14 +413,15 @@ public class graphBeta extends JPanel {
 		}
 	}
 
-	class nodeRenderer extends AbstractShapeRenderer {
-		// protected RectangularShape m_box = new Rectangle2D.Double();
-		protected Ellipse2D m_box = new Ellipse2D.Double();
 
-		@Override
-		protected Shape getRawShape(VisualItem item) {
-			m_box.setFrame(item.getX(), item.getY(), 10, 10);
-			return m_box;
-		}
-	}
 } // end of class graphBeta
+class nodeRenderer extends AbstractShapeRenderer {
+	// protected RectangularShape m_box = new Rectangle2D.Double();
+	protected Ellipse2D m_box = new Ellipse2D.Double();
+
+	@Override
+	protected Shape getRawShape(VisualItem item) {
+		m_box.setFrame(item.getX(), item.getY(), 10, 10);
+		return m_box;
+	}
+}
