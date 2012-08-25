@@ -61,7 +61,7 @@ public class Analysis {
 		sccG.addColumn("c", int.class);
 		Graph[] sgs = new Graph[g.getNodeCount()];
 		for (int i = 0; i < g.getNodeCount(); ++i)
-			if ((int) g.getNode(i).get("leader") == i) {
+			if (g.getNode(i).getInt("leader") == i) {
 				Node I = g.getNode(i);
 
 				sgs[i] = new Graph(false);
@@ -70,19 +70,19 @@ public class Analysis {
 				sgs[i].addColumn("leader", int.class);
 
 				Node t = sgs[i].addNode();
-				t.set("label", (String) I.get("label"));
-				t.set("value", (String) I.get("value"));
-				t.set("leader", (String) I.get("leader"));
+				t.set("label", I.getString("label"));
+				t.set("value", I.getString("value"));
+				t.set("leader", I.getInt("leader"));
 
 				Iterator<Node> neitr = g.getNode(i).neighbors();
 				while (neitr.hasNext()) {
 					Node n = neitr.next();
-					if ((int) n.get("leader") != i)
+					if (n.getInt("leader") != i)
 						continue;
 					Node temp = sgs[i].addNode();
-					temp.set("label", (String) n.get("label"));
-					temp.set("value", (String) n.get("value"));
-					temp.set("leader", (String) n.get("leader"));
+					temp.set("label", n.getString("label"));
+					temp.set("value", n.getString("value"));
+					temp.set("leader", n.getInt("leader"));
 				}
 
 				for (int j = 0; j < sgs[i].getNodeCount(); ++j)
