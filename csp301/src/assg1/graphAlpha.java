@@ -6,14 +6,18 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -204,12 +208,19 @@ public class graphAlpha extends JPanel {
 		m_vis.runAfter("draw", "layout");
 		m_vis.putAction("layout", color);
 		
-
+		Image img=null;
+		try{
+			img = ImageIO.read(new File("test.jpg"));
+		}
+		catch(IOException e){
+			System.out.println("Background Image File Not Found");
+		}
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
 		Display display = new Display(m_vis);
 		display.setSize(1000, 700);
 		display.pan(500, 350);
+		display.setBackgroundImage(img, true, true);
 		display.zoom(new Point2D.Float(500, 350), 1.5);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
