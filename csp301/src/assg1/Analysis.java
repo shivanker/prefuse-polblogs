@@ -1,11 +1,11 @@
 package assg1;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
+import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Table;
@@ -82,7 +82,6 @@ public class Analysis
 		}
 		s.push(n);
 	}
-	@SuppressWarnings("unchecked")
 	public static int countTriangles(Graph g)
 	{
 		int c = 0;
@@ -105,5 +104,21 @@ public class Analysis
 			}	
 		}
 		return c;
+	}
+	public static int classifyEdges(Graph g)
+	{
+		int sameEdge = 0;
+		Iterator<Edge> i = g.edges();
+		while (i.hasNext())
+		{
+			Edge temp = i.next();
+			if (temp.getSourceNode().get("value") == temp.getTargetNode().get("value"))
+				sameEdge++;
+		}
+		return sameEdge;
+	}
+	public static long nC3 (int n)
+	{
+		return ((long)n*(n-1)*(n-2))/6;
 	}
 }

@@ -9,6 +9,7 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.BorderFactory;
@@ -26,20 +27,16 @@ import prefuse.Display;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
-import prefuse.action.animate.ColorAnimator;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.DataColorAction;
 import prefuse.action.filter.GraphDistanceFilter;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
-import prefuse.activity.SlowInSlowOutPacer;
-import prefuse.controls.Control;
 import prefuse.controls.ControlAdapter;
 import prefuse.controls.DragControl;
 import prefuse.controls.FocusControl;
 import prefuse.controls.NeighborHighlightControl;
 import prefuse.controls.PanControl;
-import prefuse.controls.ToolTipControl;
 import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
@@ -50,8 +47,8 @@ import prefuse.data.io.GraphMLReader;
 import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.TupleSet;
+import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.DefaultRendererFactory;
-import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
 import prefuse.util.GraphicsLib;
@@ -70,7 +67,7 @@ import prefuse.visual.NodeItem;
 import prefuse.visual.VisualGraph;
 import prefuse.visual.VisualItem;
 
-public class graphBeta extends JPanel {
+public class graphAlpha extends JPanel {
 
 	private static final String graph = "graph";
 	private static final String nodes = "graph.nodes";
@@ -78,7 +75,7 @@ public class graphBeta extends JPanel {
 
 	private Visualization m_vis;
 
-	public graphBeta(Graph g, String label) {
+	public graphAlpha(Graph g, String label) {
 		super(new BorderLayout());
 
 		// create a new, empty visualization for our data
@@ -122,42 +119,23 @@ public class graphBeta extends JPanel {
 		int hops = 30;
 		final GraphDistanceFilter filter = new GraphDistanceFilter(graph, hops);
 
-		int[] palette = new int[] { 
-				ColorLib.rgba(255,200,200,250),
-	            ColorLib.rgba(200,255,200,250),
-	            ColorLib.rgba(200,200,255,250)
-		};
-		int[] palette2 = new int[] { ColorLib.rgb(255, 180, 180),
+		int[] palette = new int[] { ColorLib.rgb(255, 180, 180),
 				ColorLib.rgb(190, 190, 255), ColorLib.rgba(255, 255, 0, 150) };
-		
 		// map nominal data values to colors using our provided palette
-
 		DataColorAction fill = new DataColorAction(nodes, "value",
 				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		DataColorAction fill2 = new DataColorAction(nodes, "value",
-				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		fill.add(VisualItem.FIXED, ColorLib.rgba(150, 15, 100, 200));
-		fill.add(VisualItem.HIGHLIGHT, fill2);
 
-
-
+		fill.add(VisualItem.FIXED, ColorLib.rgba(255, 0, 0, 200));
+		fill.add(VisualItem.HIGHLIGHT, ColorLib.rgba(0, 0, 255, 200));
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
-		
-		
-		// use white for node text
-		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,ColorLib.gray(0));
+
+		// use black for node text
+		ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR,
+				ColorLib.gray(0));
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
-		
-		//outlines of nodes
-        ColorAction nStroke = new ColorAction(nodes, VisualItem.STROKECOLOR);
-        nStroke.setDefaultColor(ColorLib.gray(150));
-        nStroke.add("_hover", ColorLib.gray(50));
-        nStroke.add(VisualItem.HIGHLIGHT, ColorLib.gray(50));
-        nStroke.add("ingroup('_search')", ColorLib.gray(50));
-		
 		// use light grey for edges
-		ColorAction edge = new ColorAction(edges,VisualItem.STROKECOLOR, ColorLib.gray(225));
-		edge.add("_hover",  ColorLib.gray(50));
+		ColorAction edge = new ColorAction("graph.edges",
+				VisualItem.STROKECOLOR, ColorLib.rgba(1,100,130,100));
 
 		// create an action list containing all color assignments
 		ActionList color = new ActionList();
@@ -165,30 +143,21 @@ public class graphBeta extends JPanel {
 		color.add(text);
 		color.add(edge);
 
-		// animate paint change
-		ActionList animatePaint = new ActionList(1000);
-		animatePaint.add(new ColorAnimator(nodes));
-		animatePaint.add(new RepaintAction());
-		m_vis.putAction("animatePaint", animatePaint);
-		
-		SearchTupleSet s = new PrefixSearchTupleSet();
-		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, s);
-		s.addTupleSetListener(new TupleSetListener() {
-			public void tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
-				m_vis.cancel("animatePaint");
-				m_vis.run("fill");
-				m_vis.run("animatePaint");
-			}
-		});
-		
+		SearchTupleSet searchset = new PrefixSearchTupleSet();
+		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchset);
+
 		ActionList draw = new ActionList();
-		//draw.add(new ColorAction(nodes, VisualItem.STROKECOLOR, 0));
-		//draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0,0, 0)));
-		//draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib.gray(200)));
 		draw.add(filter);
+		draw.add(fill);
 		draw.add(text);
-		draw.add(new RepaintAction());
-		
+		draw.add(new ColorAction(nodes, VisualItem.STROKECOLOR, 0));
+		draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0,
+				0, 0)));
+		draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib
+				.gray(200)));
+		draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib
+				.gray(200)));
+
 		ForceSimulator fsim = new ForceSimulator();
 		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
 		fsim.addForce(new SpringForce());
@@ -197,9 +166,7 @@ public class graphBeta extends JPanel {
 		ActionList animate = new ActionList(Activity.INFINITY);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(fill);
-		animate.add(edge);
-		animate.add(text);	
-		animate.add(nStroke);
+		animate.add(text);
 		animate.add(new RepaintAction());
 
 		// finally, we register our ActionList with the Visualization.
@@ -208,14 +175,11 @@ public class graphBeta extends JPanel {
 		m_vis.putAction("draw", draw);
 		m_vis.putAction("layout", animate);
 		m_vis.runAfter("draw", "layout");
-		//m_vis.putAction("color", color);
+		m_vis.putAction("color", color);
 
-
-
-		
-		
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
+
 		Display display = new Display(m_vis);
 		display.setSize(700, 700);
 		display.pan(350, 350);
@@ -269,6 +233,15 @@ public class graphBeta extends JPanel {
 		search.setPreferredSize(new Dimension(300, 30));
 		search.setMaximumSize(new Dimension(300, 30));
 
+		/*
+		 * SearchTupleSet s = new PrefixSearchTupleSet();
+		 * m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, s);
+		 * s.addTupleSetListener(new TupleSetListener() { public void
+		 * tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
+		 * m_vis.cancel("animatePaint"); m_vis.run("recolor");
+		 * m_vis.run("animatePaint"); } });
+		 */
+
 		final JFastLabel title = new JFastLabel(" ");
 		title.setPreferredSize(new Dimension(300, 30));
 		title.setMaximumSize(new Dimension(300, 30));
@@ -284,20 +257,31 @@ public class graphBeta extends JPanel {
 		value.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
 		value.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
 		value.setBackground(Color.WHITE);
+		
+		final JFastLabel value2 = new JFastLabel(" ");
+		value2.setPreferredSize(new Dimension(300, 30));
+		value2.setMaximumSize(new Dimension(300, 30));
+		value2.setVerticalAlignment(SwingConstants.TOP);
+		value2.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
+		value2.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
+		value2.setBackground(Color.WHITE);
+		
 
 		display.addControlListener(new ControlAdapter() {
 			public void itemEntered(VisualItem item, MouseEvent e) {
 				if (item instanceof NodeItem) {
 					String label = item.getString("label");
-					String aff = (String) item.get("value");
-					if (aff.equals("c"))
+					String aff = ""+item.get("value");
+					String source = ""+item.get("source");
+					if (aff.equals("0"))
 						aff = "Conservative";
-					else if (aff.equals("n"))
+					else if (aff.equals("1"))
 						aff = "Neutral";
 					else
 						aff = "Liberal";
 					title.setText(label);
-					value.setText("Affiliation: " + aff);
+					value.setText("Affiliation: " + aff );
+					value2.setText("Source: "+ source);
 				} else
 					title.setText(":O");
 			}
@@ -305,10 +289,12 @@ public class graphBeta extends JPanel {
 			public void itemExited(VisualItem item, MouseEvent e) {
 				title.setText(null);
 				value.setText(null);
+				value2.setText(null);
+				
 			}
 		});
 
-		Box box = UILib.getBox(new Component[] { title, value, search }, false,
+		Box box = UILib.getBox(new Component[] { title, value, value2, search }, false,
 				10, 3, 0);
 		box.setBorder(BorderFactory.createTitledBorder("Node Info"));
 		box.setMaximumSize(new Dimension(310, 90));
@@ -357,8 +343,8 @@ public class graphBeta extends JPanel {
 	public static void main(String[] args) {
 		UILib.setPlatformLookAndFeel();
 
-		// create graphBeta
-		String datafile = "polbooks.xml";
+		// create graphAlpha
+		String datafile = "polblogs.xml";
 		String label = "label";
 		if (args.length > 1) {
 			datafile = args[0];
@@ -386,11 +372,11 @@ public class graphBeta extends JPanel {
 	}
 
 	public static JFrame demo(Graph g, String label) {
-		final graphBeta view = new graphBeta(g, label);
+		final graphAlpha view = new graphAlpha(g, label);
 
 		// launch window
 		JFrame frame = new JFrame(
-				"c s p 3 0 1  |  a s s i g n m e n t 1 | p o l b o o k s");
+				"c s p 3 0 1  |  a s s i g n m e n t 1 | p o l b l o g s");
 		frame.setContentPane(view);
 		frame.pack();
 		frame.setVisible(true);
@@ -429,61 +415,14 @@ public class graphBeta extends JPanel {
 		}
 	}
 
-	class nodeRenderer extends ShapeRenderer {
+	class nodeRenderer extends AbstractShapeRenderer {
+		// protected RectangularShape m_box = new Rectangle2D.Double();
+		protected Ellipse2D m_box = new Ellipse2D.Double();
 
 		@Override
 		protected Shape getRawShape(VisualItem item) {
-			double x = item.getX();
-			if (Double.isNaN(x) || Double.isInfinite(x))
-				x = 0;
-			double y = item.getY();
-			if (Double.isNaN(y) || Double.isInfinite(y))
-				y = 0;
-			double width = getBaseSize() * item.getSize();
-
-			// Center the shape around the specified x and y
-			if (width > 1) {
-				x = x - width / 2;
-				y = y - width / 2;
-			}
-
-			if (!item.canGet("value", String.class))
-				return ellipse(x, y, width, width);
-			String v = (String) item.get("value");
-			if (v.equals("c"))
-				return rectangle(x, y, width, width);
-			else if (v.equals("n"))
-				return triangle_down((float) x, (float) y, (float) width);
-			else
-				return ellipse(x, y, width, width);
-
-			// switch ( stype ) {
-			// case Constants.SHAPE_NONE:
-			// return null;
-			// case Constants.SHAPE_RECTANGLE:
-			// return rectangle(x, y, width, width);
-			// case Constants.SHAPE_ELLIPSE:
-			// return ellipse(x, y, width, width);
-			// case Constants.SHAPE_TRIANGLE_UP:
-			// return triangle_up((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_DOWN:
-			// return triangle_down((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_LEFT:
-			// return triangle_left((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_RIGHT:
-			// return triangle_right((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_CROSS:
-			// return cross((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_STAR:
-			// return star((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_HEXAGON:
-			// return hexagon((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_DIAMOND:
-			// return diamond((float)x, (float)y, (float)width);
-			// default:
-			// throw new IllegalStateException("Unknown shape type: "+stype);
-			// }
+			m_box.setFrame(item.getX(), item.getY(), 10, 10);
+			return m_box;
 		}
-
 	}
-}
+} // end of class graphAlpha
