@@ -154,11 +154,14 @@ public class graphAlpha extends JPanel {
 		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(225));
 		
 		// create an action list containing all color assignments
-		ActionList color = new ActionList();
-		color.add(fill);
-		color.add(text);
+		ActionList color = new ActionList(Activity.INFINITY);
+		/*color.add(fill);
 		color.add(edge);
-
+		color.add(text);
+		color.add(nStroke);
+		color.add(new RepaintAction());
+		*/
+		
 		// animate paint change
 		ActionList animatePaint = new ActionList(1000);
 		animatePaint.add(new ColorAnimator(nodes));
@@ -186,7 +189,7 @@ public class graphAlpha extends JPanel {
 		fsim.addForce(new SpringForce());
 		fsim.addForce(new DragForce(0.015f));
 
-		ActionList animate = new ActionList(Activity.INFINITY);
+		ActionList animate = new ActionList(20000);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(fill);
 		animate.add(edge);
@@ -199,8 +202,9 @@ public class graphAlpha extends JPanel {
 		// Visualization, using the name we've chosen below.
 		m_vis.putAction("draw", draw);
 		m_vis.putAction("layout", animate);
-		m_vis.runAfter("draw", "layout");
+		m_vis.runAfter("draw", "color");
 		m_vis.putAction("color", color);
+		m_vis.runAfter("color", "layout");
 
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
