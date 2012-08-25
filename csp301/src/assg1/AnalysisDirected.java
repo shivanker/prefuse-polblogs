@@ -20,24 +20,20 @@ public class AnalysisDirected {
 		Table tb = new Table();
 		tb.addColumn("Conservative", int.class, 0);
 		tb.addColumn("Liberal", int.class, 0);
-		tb.addColumn("Neutral", int.class, 0);
 		tb.addRows(g.getNodeCount());
 		while (nodes.hasNext()) {
 			Node temp = nodes.next();
 			Iterator<Node> neighbor = temp.neighbors();
-			int c = 0, l = 0, n = 0;
+			int c = 0, l = 0;
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
 				if (t.get("value") == "c")
 					c++;
-				else if (t.get("value") == "l")
-					l++;
 				else
-					n++;
+					l++;
 			}
 			tb.setInt((int) temp.get("id"), "Conservative", c);
 			tb.setInt((int) temp.get("id"), "Liberal", l);
-			tb.setInt((int) temp.get("id"), "Neutral", n);
 		}
 		return tb;
 	}
@@ -165,10 +161,6 @@ public class AnalysisDirected {
 				sameEdge++;
 		}
 		return sameEdge;
-	}
-
-	public static long nC3(int n) {
-		return ((long) n * (n - 1) * (n - 2)) / 6;
 	}
 	
 	public static void main(String... args) throws DataIOException	{
