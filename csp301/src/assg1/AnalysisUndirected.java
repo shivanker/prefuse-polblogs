@@ -1,5 +1,6 @@
 package assg1;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -77,7 +78,7 @@ public class AnalysisUndirected {
 		{
 			Node temp = node.next();
 			int n = temp.getDegree();
-			temp.setDouble("localClusteringCoefficient", (2*temp.getInt("Triangles"))/(n*(n-1)));
+			temp.setDouble("localClusteringCoefficient", (n>1)?(2*temp.getInt("Triangles"))/((double)n*(n-1)):0);
 			c.Clustering += temp.getDouble("localClusteringCoefficient");
 		}
 		c.Clustering /= (double)(g.getNodeCount());
@@ -88,24 +89,40 @@ public class AnalysisUndirected {
 		Iterator<Edge> i = g.edges();
 		while (i.hasNext()) {
 			Edge temp = i.next();
-			if (temp.getSourceNode().get("value") == temp.getTargetNode().get(
-					"value"))
+			if (temp.getSourceNode().getString("value").equals(temp.getTargetNode().getString("value")))
 				sameEdge++;
 		}
 		return sameEdge;
 	}
 
-	public static void main(String... args) throws DataIOException	{
-		Graph polbooks = new GraphMLReader().readGraph("polbooks.xml");
-		polbooks.addColumn("id", int.class);
-		Iterator<Node> n = polbooks.nodes();
+	public static void main(String... args) throws DataIOException, IOException	{
+		Graph g = new GraphMLReader().readGraph("polbooks.xml");
+		g.addColumn("id", int.class);
+		Iterator<Node> n = g.nodes();
 		int i = 0;
 		while(n.hasNext())	{
 			n.next().set("id", i++);
 		}
-
-		System.out.println(countTrianglesAndNetworkClusteringCoefficient(polbooks).Triangles);
-		System.out.println(countTrianglesAndNetworkClusteringCoefficient(polbooks).Clustering);
+		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
+		System.out.println("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\"");
+		System.out.println("polbooks.xml,"+(((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
+		for (int j=1; j<=50; j++)
+		{
+			String filename = "polbooks_rand_"+j+".xml";
+			g = new GraphMLReader().readGraph("polbooks_rand_\\"+filename);
+			g.addColumn("id", int.class);
+			n = g.nodes();
+			i = 0;
+			while(n.hasNext())	{
+				n.next().set("id", i++);
+			}
+			t = countTrianglesAndNetworkClusteringCoefficient(g);
+			System.out.println((filename+","+((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
+		}
+	}
+	static long nC3(int n)
+	{
+		return (n*(n-1)*(n-2)/6);
 	}
 }
 class tuple

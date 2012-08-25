@@ -6,14 +6,18 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -53,6 +57,7 @@ import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
+import prefuse.render.EdgeRenderer;
 import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
@@ -92,8 +97,15 @@ public class graphAlpha extends JPanel {
 		// ShapeRenderer sr = new ShapeRenderer();
 		// LabelRenderer tr = new LabelRenderer();
 		// tr.setRoundedCorner(20, 20);
+		
+		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,Constants.EDGE_ARROW_REVERSE);
 		nodeRenderer nr = new nodeRenderer();
-		m_vis.setRendererFactory(new DefaultRendererFactory(nr));
+		m_vis.setRendererFactory(new DefaultRendererFactory(nr,er));
+		
+		er.setArrowHeadSize(5, 5);
+		er.setDefaultLineWidth(0.5);
+		
+		
 
 		// --------------------------------------------------------------------
 		// register the data with a visualization
@@ -102,18 +114,22 @@ public class graphAlpha extends JPanel {
 
 		// fix selected focus nodes
 		TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS);
+		
 		focusGroup.addTupleSetListener(new TupleSetListener() {
 			public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
 				for (int i = 0; i < rem.length; ++i)
 					((VisualItem) rem[i]).setFixed(false);
+				
 				for (int i = 0; i < add.length; ++i) {
 					((VisualItem) add[i]).setFixed(false);
 					((VisualItem) add[i]).setFixed(true);
 				}
+				
 				if (ts.getTupleCount() == 0) {
 					ts.addTuple(rem[0]);
 					((VisualItem) rem[0]).setFixed(false);
 				}
+				
 				m_vis.run("draw");
 			}
 		});
@@ -132,30 +148,33 @@ public class graphAlpha extends JPanel {
 				ColorLib.rgba(0, 128, 0, 200), ColorLib.rgba(0, 0, 128, 200) };
 
 		// map nominal data values to colors using our provided palette
-		DataColorAction fill = new DataColorAction(nodes, "value",
-				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		DataColorAction fill2 = new DataColorAction(nodes, "value",
-				Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
+		DataColorAction fill = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+		DataColorAction fill2 = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
 		fill.add(VisualItem.FIXED, ColorLib.rgba(0, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, fill2);
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
 
 		// use white for node text
-		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,
-				ColorLib.gray(0));
+		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,ColorLib.gray(0));
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
 
 		// outlines of nodes
 		ColorAction nStroke = new ColorAction(nodes, VisualItem.STROKECOLOR);
-		nStroke.setDefaultColor(ColorLib.gray(150));
-		nStroke.add("_hover", ColorLib.gray(100));
-		nStroke.add(VisualItem.HIGHLIGHT, ColorLib.gray(100));
-		nStroke.add("ingroup('_search')", ColorLib.gray(100));
+		nStroke.setDefaultColor(ColorLib.gray(50));
+		nStroke.add("_hover", ColorLib.gray(10));
+		nStroke.add(VisualItem.HIGHLIGHT, ColorLib.gray(10));
+		nStroke.add("ingroup('_search')", ColorLib.gray(10));
 
 		// use light grey for edges
-		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,
-				ColorLib.gray(225));
-
+		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(200));
+		// use dark light grey for edges
+		ColorAction edge1 = new ColorAction(edges, VisualItem.FILLCOLOR,ColorLib.gray(150));
+		
+		ColorAction edge2 = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(50));
+		ColorAction edge3 = new ColorAction(edges, VisualItem.FILLCOLOR,ColorLib.gray(50));
+		edge.add(VisualItem.HIGHLIGHT,edge2);
+		edge1.add(VisualItem.HIGHLIGHT, edge3);
+		
 		// animate paint change
 		ActionList animatePaint = new ActionList(1000);
 		animatePaint.add(new ColorAnimator(nodes));
@@ -188,6 +207,8 @@ public class graphAlpha extends JPanel {
 		color.add(fill);
 		color.add(text);
 		color.add(edge);
+		color.add(edge1);
+		//color.add(edge2);
 		color.add(nStroke);
 		color.add(new RepaintAction());
 
@@ -204,12 +225,19 @@ public class graphAlpha extends JPanel {
 		m_vis.runAfter("draw", "layout");
 		m_vis.putAction("layout", color);
 		
-
+		Image img=null;
+		try{
+			img = ImageIO.read(new File("test1.jpg"));
+		}
+		catch(IOException e){
+			System.out.println("Background Image File Not Found");
+		}
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
 		Display display = new Display(m_vis);
 		display.setSize(1000, 700);
 		display.pan(500, 350);
+		//display.setBackgroundImage(img, true, true);
 		display.zoom(new Point2D.Float(500, 350), 1.5);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
