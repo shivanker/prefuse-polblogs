@@ -9,6 +9,8 @@ import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Table;
+import prefuse.data.io.DataIOException;
+import prefuse.data.io.GraphMLReader;
 
 public class Analysis2 {
 	static Stack<Node> s = new Stack<Node>();
@@ -133,6 +135,8 @@ public class Analysis2 {
 	public static int countTriangles(Graph g) {
 		int c = 0;
 		g.addColumn("close", HashSet.class, null);
+		for(int i=0; i<g.getNodeCount(); ++i)
+			g.getNode(i).set("close", new HashSet<Node>());
 		Iterator<Node> nodes = g.nodes();
 		while (nodes.hasNext()) {
 			Node s = nodes.next();
@@ -165,5 +169,16 @@ public class Analysis2 {
 
 	public static long nC3(int n) {
 		return ((long) n * (n - 1) * (n - 2)) / 6;
+	}
+	
+	public static void main(String... args) throws DataIOException	{
+		Graph polbooks = new GraphMLReader().readGraph("polblogs.xml");
+		polbooks.addColumn("id", int.class);
+		Iterator<Node> n = polbooks.nodes();
+		int i = 0;
+		while(n.hasNext())	{
+			n.next().set("id", i++);
+		}
+		System.out.println(countTriangles(polbooks));
 	}
 }

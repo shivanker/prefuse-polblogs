@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -42,6 +43,7 @@ import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
 import prefuse.data.Graph;
+import prefuse.data.Node;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
 import prefuse.data.io.GraphMLReader;
@@ -387,6 +389,16 @@ public class graphAlpha extends JPanel {
 	}
 
 	public static JFrame demo(Graph g, String label) {
+
+		if(!g.getNode(0).canGetInt("id"))	{
+			g.addColumn("id", int.class);
+			Iterator<Node> n = g.nodes();
+			int i = 0;
+			while(n.hasNext())	{
+				n.next().set("id", i++);
+			}
+		}
+		
 		final graphAlpha view = new graphAlpha(g, label);
 
 		// launch window
