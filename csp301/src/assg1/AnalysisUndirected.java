@@ -104,12 +104,12 @@ public class AnalysisUndirected {
 			n.next().set("id", i++);
 		}
 		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
-		System.out.println("\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\"");
-		System.out.println((((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
+		System.out.println("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\"");
+		System.out.println("polbooks.xml,"+(((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
 		for (int j=1; j<=50; j++)
 		{
-			String filename = "polbooks_rand_\\polbooks_rand_"+j+".xml";
-			g = new GraphMLReader().readGraph(filename);
+			String filename = "polbooks_rand_"+j+".xml";
+			g = new GraphMLReader().readGraph("polbooks_rand_\\"+filename);
 			g.addColumn("id", int.class);
 			n = g.nodes();
 			i = 0;
@@ -117,7 +117,7 @@ public class AnalysisUndirected {
 				n.next().set("id", i++);
 			}
 			t = countTrianglesAndNetworkClusteringCoefficient(g);
-			System.out.println((((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
+			System.out.println((filename+","+((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
 		}
 	}
 	static long nC3(int n)
