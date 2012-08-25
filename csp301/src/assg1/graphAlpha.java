@@ -191,7 +191,7 @@ public class graphAlpha extends JPanel {
 		color.add(nStroke);
 		color.add(new RepaintAction());
 
-		ActionList animate = new ActionList(20000);
+		ActionList animate = new ActionList(30000);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(new RepaintAction());
 		
