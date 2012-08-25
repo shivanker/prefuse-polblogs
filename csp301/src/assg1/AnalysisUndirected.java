@@ -12,7 +12,7 @@ import prefuse.data.Table;
 import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
 
-public class Analysis {
+public class AnalysisUndirected {
 	static Stack<Node> s = new Stack<Node>();
 
 	public static Table nodalAnalysis(Graph g) {
