@@ -88,6 +88,16 @@ public class Analysis {
 		while(n.hasNext())	{
 			n.next().set("id", i++);
 		}
-		System.out.println(countTriangles(polbooks));
+		Iterator<Node> m = polbooks.nodes();
+		while(m.hasNext())	{
+			Node t = m.next();
+			Iterator<Node> p = t.neighbors();
+			if(!p.hasNext())
+				continue;
+			System.out.print(t.getInt("id")+1);
+			while(p.hasNext())
+				System.out.print(" "+(p.next().getInt("id")+1));
+			System.out.println();
+		}
 	}
 }
