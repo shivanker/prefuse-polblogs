@@ -41,9 +41,11 @@ public class Analysis {
 		}
 		return tb;
 	}
-
-	public static int countTriangles(Graph g) {
-		int c = 0;
+	
+	public static tuple countTrianglesAndNetworkClusteringCoefficient(Graph g) {
+		tuple c = new tuple(0,0.0);
+		g.addColumn("Triangles", int.class, 0);
+		g.addColumn("localClusteringCoefficient", double.class, 0);
 		g.addColumn("close", HashSet.class, null);
 		for(int i=0; i<g.getNodeCount(); ++i)
 			g.getNode(i).set("close", new HashSet<Node>());
@@ -56,14 +58,31 @@ public class Analysis {
 				if (t.getInt("id") > s.getInt("id")) {
 					Set<Node> intersection = new HashSet((HashSet<Node>) s.get("close"));
 					intersection.retainAll((HashSet<Node>) t.get("close"));
-					c += intersection.size();
+					int n = intersection.size();
+					c.Triangles += n;
+					s.setInt("Triangles", s.getInt("Triangles")+n);
+					t.setInt("Triangles", t.getInt("Triangles")+n);
+					Iterator<Node> i = intersection.iterator();
+					while (i.hasNext())
+					{
+						Node temp = i.next();
+						temp.setInt("Triangles", temp.getInt("Triangles")+1);
+					}
 					((HashSet<Node>) t.get("close")).add(s);
 				}
 			}
 		}
+		Iterator<Node> node = g.nodes();
+		while (node.hasNext())
+		{
+			Node temp = node.next();
+			int n = temp.getDegree();
+			temp.setDouble("localClusteringCoefficient", (2*temp.getInt("Triangles"))/(n*(n-1)));
+			c.Clustering += temp.getDouble("localClusteringCoefficient");
+		}
+		c.Clustering /= (double)(g.getNodeCount());
 		return c;
 	}
-
 	public static int classifyEdges(Graph g) {
 		int sameEdge = 0;
 		Iterator<Edge> i = g.edges();
@@ -88,6 +107,17 @@ public class Analysis {
 		while(n.hasNext())	{
 			n.next().set("id", i++);
 		}
-		System.out.println(countTriangles(polbooks));
+		System.out.println(countTrianglesAndNetworkClusteringCoefficient(polbooks).Triangles);
+		System.out.println(countTrianglesAndNetworkClusteringCoefficient(polbooks).Clustering);
+	}
+}
+class tuple
+{
+	int Triangles;
+	double Clustering;
+	tuple(int a, double b)
+	{
+		Triangles = a;
+		Clustering = b;
 	}
 }
