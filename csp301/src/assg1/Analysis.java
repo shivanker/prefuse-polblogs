@@ -95,10 +95,6 @@ public class Analysis {
 		return sameEdge;
 	}
 
-	public static long nC3(int n) {
-		return ((long) n * (n - 1) * (n - 2)) / 6;
-	}
-	
 	public static void main(String... args) throws DataIOException	{
 		Graph polbooks = new GraphMLReader().readGraph("polbooks.xml");
 		polbooks.addColumn("id", int.class);
