@@ -77,7 +77,7 @@ public class AnalysisUndirected {
 		{
 			Node temp = node.next();
 			int n = temp.getDegree();
-			temp.setDouble("localClusteringCoefficient", (2*temp.getInt("Triangles"))/(n*(n-1)));
+			temp.setDouble("localClusteringCoefficient", (2*temp.getInt("Triangles"))/((double)n*(n-1)));
 			c.Clustering += temp.getDouble("localClusteringCoefficient");
 		}
 		c.Clustering /= (double)(g.getNodeCount());
@@ -88,24 +88,28 @@ public class AnalysisUndirected {
 		Iterator<Edge> i = g.edges();
 		while (i.hasNext()) {
 			Edge temp = i.next();
-			if (temp.getSourceNode().get("value") == temp.getTargetNode().get(
-					"value"))
+			if (temp.getSourceNode().getString("value").equals(temp.getTargetNode().getString("value")))
 				sameEdge++;
 		}
 		return sameEdge;
 	}
 
 	public static void main(String... args) throws DataIOException	{
-		Graph polbooks = new GraphMLReader().readGraph("polbooks.xml");
-		polbooks.addColumn("id", int.class);
-		Iterator<Node> n = polbooks.nodes();
+		Graph g = new GraphMLReader().readGraph("polbooks.xml");
+		g.addColumn("id", int.class);
+		Iterator<Node> n = g.nodes();
 		int i = 0;
 		while(n.hasNext())	{
 			n.next().set("id", i++);
 		}
-
-		System.out.println(countTrianglesAndNetworkClusteringCoefficient(polbooks).Triangles);
-		System.out.println(countTrianglesAndNetworkClusteringCoefficient(polbooks).Clustering);
+		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
+		System.out.println("Global Clustering Coefficient = "+((double)t.Triangles)/nC3(g.getNodeCount()));
+		System.out.println("Average Network Clustering Coefficient = "+t.Clustering);
+		System.out.println("Edge Ratio = "+((double)classifyEdges(g)/g.getEdgeCount()));
+	}
+	static long nC3(int n)
+	{
+		return (n*(n-1)*(n-2)/6);
 	}
 }
 class tuple
