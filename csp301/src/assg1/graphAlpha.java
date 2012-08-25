@@ -5,10 +5,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
@@ -120,29 +122,27 @@ public class graphAlpha extends JPanel {
 		// create actions to process the visual data
 		int hops = 30;
 		final GraphDistanceFilter filter = new GraphDistanceFilter(graph, hops);
-		
+
 		// color set for default node
-		int[] palette = new int[] { 
-				ColorLib.rgba(255, 200, 200, 250),
+		int[] palette = new int[] { ColorLib.rgba(255, 200, 200, 250),
 				ColorLib.rgba(200, 255, 200, 250),
-				ColorLib.rgba(200, 200, 255, 250) 
-				};
+				ColorLib.rgba(200, 200, 255, 250) };
 		// color set for highlighted node
-		int[] palette2 = new int[] { 
-				ColorLib.rgba(255, 20, 147,200),
-				ColorLib.rgba(0, 128, 0,200), 
-				ColorLib.rgba(0, 0, 128, 200) 
-				};
+		int[] palette2 = new int[] { ColorLib.rgba(255, 20, 147, 200),
+				ColorLib.rgba(0, 128, 0, 200), ColorLib.rgba(0, 0, 128, 200) };
 
 		// map nominal data values to colors using our provided palette
-		DataColorAction fill = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		DataColorAction fill2 = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
+		DataColorAction fill = new DataColorAction(nodes, "value",
+				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+		DataColorAction fill2 = new DataColorAction(nodes, "value",
+				Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
 		fill.add(VisualItem.FIXED, ColorLib.rgba(0, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, fill2);
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
 
 		// use white for node text
-		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,ColorLib.gray(0));
+		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,
+				ColorLib.gray(0));
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
 
 		// outlines of nodes
@@ -153,23 +153,15 @@ public class graphAlpha extends JPanel {
 		nStroke.add("ingroup('_search')", ColorLib.gray(100));
 
 		// use light grey for edges
-		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(225));
-		
-		// create an action list containing all color assignments
-		ActionList color = new ActionList(Activity.INFINITY);
-		/*color.add(fill);
-		color.add(edge);
-		color.add(text);
-		color.add(nStroke);
-		color.add(new RepaintAction());
-		*/
-		
+		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,
+				ColorLib.gray(225));
+
 		// animate paint change
 		ActionList animatePaint = new ActionList(1000);
 		animatePaint.add(new ColorAnimator(nodes));
 		animatePaint.add(new RepaintAction());
 		m_vis.putAction("animatePaint", animatePaint);
-		
+
 		// search
 		SearchTupleSet s = new PrefixSearchTupleSet();
 		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, s);
@@ -191,28 +183,34 @@ public class graphAlpha extends JPanel {
 		fsim.addForce(new SpringForce());
 		fsim.addForce(new DragForce(0.015f));
 
+		// create an action list containing all color assignments
+		ActionList color = new ActionList(Activity.INFINITY);
+		color.add(fill);
+		color.add(text);
+		color.add(edge);
+		color.add(nStroke);
+		color.add(new RepaintAction());
+
 		ActionList animate = new ActionList(20000);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
-		animate.add(fill);
-		animate.add(edge);
-		animate.add(text);
-		animate.add(nStroke);
 		animate.add(new RepaintAction());
-
+		
+		
 		// finally, we register our ActionList with the Visualization.
 		// we can later execute our Actions by invoking a method on our
 		// Visualization, using the name we've chosen below.
 		m_vis.putAction("draw", draw);
 		m_vis.putAction("layout", animate);
-		m_vis.runAfter("draw", "color");
-		m_vis.putAction("color", color);
-		m_vis.runAfter("color", "layout");
+		m_vis.runAfter("draw", "layout");
+		m_vis.putAction("layout", color);
+		
 
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
 		Display display = new Display(m_vis);
-		display.setSize(700, 700);
-		display.pan(350, 350);
+		display.setSize(1000, 700);
+		display.pan(500, 350);
+		display.zoom(new Point2D.Float(500, 350), 1.5);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
 
@@ -231,13 +229,12 @@ public class graphAlpha extends JPanel {
 		overview.setSize(290, 290);
 		overview.addItemBoundsListener(new FitOverviewListener());
 
-
 		// --------------------------------------------------------------------
 		// launch the visualization
 
 		// create a panel for editing force values Sliders
 		JForcePanel fpanel = new JForcePanel(fsim);
-		
+
 		// Hops Slider
 		final JValueSlider slider = new JValueSlider("Distance", 0, hops, hops);
 		slider.addChangeListener(new ChangeListener() {
@@ -249,20 +246,21 @@ public class graphAlpha extends JPanel {
 		slider.setBackground(Color.WHITE);
 		slider.setPreferredSize(new Dimension(300, 30));
 		slider.setMaximumSize(new Dimension(300, 30));
-		
+
 		// Connectivity filter BOX
 		Box cf = new Box(BoxLayout.Y_AXIS);
 		cf.add(slider);
 		cf.setBorder(BorderFactory.createTitledBorder("Connectivity Filter"));
 		fpanel.add(cf);
 
-		JSearchPanel search = new JSearchPanel(m_vis, nodes, "label", true,true);
+		JSearchPanel search = new JSearchPanel(m_vis, nodes, "label", true,
+				true);
 		search.setShowResultCount(true);
 		search.setBorder(BorderFactory.createEmptyBorder(5, 5, 4, 0));
 		search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
 		search.setPreferredSize(new Dimension(300, 30));
 		search.setMaximumSize(new Dimension(300, 30));
-		
+
 		// title label
 		final JFastLabel title = new JFastLabel(" ");
 		title.setPreferredSize(new Dimension(300, 30));
@@ -280,7 +278,7 @@ public class graphAlpha extends JPanel {
 		value.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
 		value.setFont(FontLib.getFont("Calibri", Font.PLAIN, 16));
 		value.setBackground(Color.WHITE);
-		
+
 		final JFastLabel value2 = new JFastLabel(" ");
 		value2.setPreferredSize(new Dimension(300, 30));
 		value2.setMaximumSize(new Dimension(300, 30));
@@ -294,8 +292,8 @@ public class graphAlpha extends JPanel {
 			public void itemEntered(VisualItem item, MouseEvent e) {
 				if (item instanceof NodeItem) {
 					String label = item.getString("label");
-					String aff = ""+item.get("value");
-					String source = ""+item.get("source");
+					String aff = "" + item.get("value");
+					String source = "" + item.get("source");
 					if (aff.equals("0"))
 						aff = "Conservative";
 					else if (aff.equals("1"))
@@ -303,8 +301,8 @@ public class graphAlpha extends JPanel {
 					else
 						aff = "Liberal";
 					title.setText(label);
-					value.setText("Affiliation: " + aff );
-					value2.setText("Source: "+ source);
+					value.setText("Affiliation: " + aff);
+					value2.setText("Source: " + source);
 				} else
 					title.setText(":O");
 			}
@@ -313,11 +311,13 @@ public class graphAlpha extends JPanel {
 				title.setText(null);
 				value.setText(null);
 				value2.setText(null);
-				
+
 			}
 		});
 
-		Box box = UILib.getBox(new Component[] { title, value, value2, search }, false,10, 3, 0);
+		Box box = UILib.getBox(
+				new Component[] { title, value, value2, search }, false, 10, 3,
+				0);
 		box.setBorder(BorderFactory.createTitledBorder("Node Info"));
 		box.setMaximumSize(new Dimension(310, 90));
 
@@ -325,30 +325,29 @@ public class graphAlpha extends JPanel {
 		fpanel.add(Box.createVerticalGlue());
 		fpanel.add(overview);
 
-		//Box radioBox = new Box(BoxLayout.X_AXIS);
-		//UILib.setFont(radioBox, FontLib.getFont("Tahoma", 15));
-		//radioBox.setBorder(BorderFactory.createTitledBorder("Radio Box"));				
-		
+		// Box radioBox = new Box(BoxLayout.X_AXIS);
+		// UILib.setFont(radioBox, FontLib.getFont("Tahoma", 15));
+		// radioBox.setBorder(BorderFactory.createTitledBorder("Radio Box"));
+
 		// create a new JSplitPane to present the interface
 		JSplitPane split = new JSplitPane();
 		split.setLeftComponent(display);
 		split.setRightComponent(fpanel);
 		split.setOneTouchExpandable(true);
 		split.setContinuousLayout(false);
-		split.setDividerLocation(700);
+		split.setDividerLocation(1000);
 		// split.setTopComponent(topPanel);
-		
+
 		// now we run our action list
 		m_vis.run("draw");
 
 		add(split);
 		// add(radioBox, BorderLayout.NORTH);
 
-
 	}
 
 	public void setGraph(Graph g, String label) {
-		
+
 		// update graph
 		m_vis.removeGroup(graph);
 		VisualGraph vg = m_vis.addGraph(graph, g);
@@ -371,9 +370,16 @@ public class graphAlpha extends JPanel {
 			datafile = args[0];
 			label = args[1];
 		}
-
+		GraphicsEnvironment e = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
 		JFrame frame = demo(datafile, label);
+
+		frame.setMaximizedBounds(e.getMaximumWindowBounds());
+		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// frame.setVisible(true);
 	}
 
 	public static JFrame demo() {
@@ -394,15 +400,15 @@ public class graphAlpha extends JPanel {
 
 	public static JFrame demo(Graph g, String label) {
 
-		if(!g.getNode(0).canGetInt("id"))	{
+		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
 			Iterator<Node> n = g.nodes();
 			int i = 0;
-			while(n.hasNext())	{
+			while (n.hasNext()) {
 				n.next().set("id", i++);
 			}
 		}
-		
+
 		final graphAlpha view = new graphAlpha(g, label);
 
 		// launch window
@@ -466,7 +472,7 @@ public class graphAlpha extends JPanel {
 
 			if (!item.canGet("value", String.class))
 				return ellipse(x, y, width, width);
-			String v = ""+ item.get("value");
+			String v = "" + item.get("value");
 			if (v.equals("c"))
 				return rectangle(x, y, width, width);
 			else if (v.equals("n"))
