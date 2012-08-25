@@ -5,11 +5,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
@@ -155,12 +158,6 @@ public class graphBeta extends JPanel {
 		// use light grey for edges
 		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(225));
 		
-		// create an action list containing all color assignments
-		ActionList color = new ActionList();
-		color.add(fill);
-		color.add(text);
-		color.add(edge);
-
 		// animate paint change
 		ActionList animatePaint = new ActionList(1000);
 		animatePaint.add(new ColorAnimator(nodes));
@@ -188,12 +185,18 @@ public class graphBeta extends JPanel {
 		fsim.addForce(new SpringForce());
 		fsim.addForce(new DragForce(0.015f));
 
+		
+
+		// create an action list containing all color assignments
+		ActionList color = new ActionList(Activity.INFINITY);
+		color.add(fill);
+		color.add(text);
+		color.add(edge);
+		color.add(nStroke);
+		color.add(new RepaintAction());
+		
 		ActionList animate = new ActionList(Activity.INFINITY);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
-		animate.add(fill);
-		animate.add(edge);
-		animate.add(text);
-		animate.add(nStroke);
 		animate.add(new RepaintAction());
 
 		// finally, we register our ActionList with the Visualization.
@@ -202,18 +205,19 @@ public class graphBeta extends JPanel {
 		m_vis.putAction("draw", draw);
 		m_vis.putAction("layout", animate);
 		m_vis.runAfter("draw", "layout");
-		m_vis.putAction("color", color);
-
+		m_vis.putAction("layout", color);
+		
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
 		Display display = new Display(m_vis);
 		display.setSize(700, 700);
-		display.pan(350, 350);
+		display.pan(500, 350);
+		display.zoom(new Point2D.Float(500,350),1.5);
 		display.setForeground(Color.GRAY);
-		display.setBackground(Color.white);
+		display.setBackground(Color.WHITE);
 
 		// main display controls
-		display.addControlListener(new FocusControl(1));
+		display.addControlListener(new FocusControl(2));
 		display.addControlListener(new DragControl());
 		display.addControlListener(new PanControl());
 		display.addControlListener(new ZoomControl());
@@ -319,7 +323,7 @@ public class graphBeta extends JPanel {
 		split.setRightComponent(fpanel);
 		split.setOneTouchExpandable(true);
 		split.setContinuousLayout(false);
-		split.setDividerLocation(700);
+		split.setDividerLocation(1000);
 		// split.setTopComponent(topPanel);
 		
 		// now we run our action list
@@ -345,7 +349,7 @@ public class graphBeta extends JPanel {
 	// ------------------------------------------------------------------------
 	// Main and demo methods
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		UILib.setPlatformLookAndFeel();
 
 		// create graphBeta
@@ -355,8 +359,13 @@ public class graphBeta extends JPanel {
 			datafile = args[0];
 			label = args[1];
 		}
-
+		GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		JFrame frame = demo(datafile, label);
+		
+		frame.setMaximizedBounds(e.getMaximumWindowBounds());
+		frame.setExtendedState( frame.getExtendedState()|JFrame.MAXIMIZED_BOTH );
+		//frame.setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("test.jpg")))));
+		//frame.setBackground(Color.GREEN);		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
