@@ -1,5 +1,6 @@
 package assg1;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -77,7 +78,7 @@ public class AnalysisUndirected {
 		{
 			Node temp = node.next();
 			int n = temp.getDegree();
-			temp.setDouble("localClusteringCoefficient", (2*temp.getInt("Triangles"))/((double)n*(n-1)));
+			temp.setDouble("localClusteringCoefficient", (n>1)?(2*temp.getInt("Triangles"))/((double)n*(n-1)):0);
 			c.Clustering += temp.getDouble("localClusteringCoefficient");
 		}
 		c.Clustering /= (double)(g.getNodeCount());
@@ -94,7 +95,7 @@ public class AnalysisUndirected {
 		return sameEdge;
 	}
 
-	public static void main(String... args) throws DataIOException	{
+	public static void main(String... args) throws DataIOException, IOException	{
 		Graph g = new GraphMLReader().readGraph("polbooks.xml");
 		g.addColumn("id", int.class);
 		Iterator<Node> n = g.nodes();
@@ -103,9 +104,21 @@ public class AnalysisUndirected {
 			n.next().set("id", i++);
 		}
 		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
-		System.out.println("Global Clustering Coefficient = "+((double)t.Triangles)/nC3(g.getNodeCount()));
-		System.out.println("Average Network Clustering Coefficient = "+t.Clustering);
-		System.out.println("Edge Ratio = "+((double)classifyEdges(g)/g.getEdgeCount()));
+		System.out.println("\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\"");
+		System.out.println((((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
+		for (int j=1; j<=50; j++)
+		{
+			String filename = "polbooks_rand_\\polbooks_rand_"+j+".xml";
+			g = new GraphMLReader().readGraph(filename);
+			g.addColumn("id", int.class);
+			n = g.nodes();
+			i = 0;
+			while(n.hasNext())	{
+				n.next().set("id", i++);
+			}
+			t = countTrianglesAndNetworkClusteringCoefficient(g);
+			System.out.println((((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
+		}
 	}
 	static long nC3(int n)
 	{
