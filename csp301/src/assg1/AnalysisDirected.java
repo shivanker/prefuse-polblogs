@@ -165,6 +165,8 @@ public class AnalysisDirected {
 		int i = 0;
 		while(in.hasNext())	{
 			Node t = in.next();
+			if (t.getInt("size") > 2)
+				System.out.println(t.getInt("size"));
 			if(!t.edges().hasNext())
 				sccG.removeNode(t);
 			else	{
@@ -184,6 +186,8 @@ public class AnalysisDirected {
 			Edge a = ed.next();
 			sg2.addEdge(a.getSourceNode().getInt("id"), a.getTargetNode().getInt("id"));
 		}
+		
+		
 		
 		return sg2;
 	}
@@ -210,10 +214,12 @@ public class AnalysisDirected {
 		s.push(n);
 	}
 
-	public static int countTriangles(Graph g) {
-		int c = 0;
+	public static tuple countTriangles(Graph g) {
+		tuple c = new tuple(0,0.0);
+		g.addColumn("Numerator", int.class, 0);
+		g.addColumn("localClusteringCoefficient", double.class, 0);
 		g.addColumn("close", HashSet.class, null);
-		for (int i = 0; i < g.getNodeCount(); ++i)
+		for(int i=0; i<g.getNodeCount(); ++i)
 			g.getNode(i).set("close", new HashSet<Node>());
 		Iterator<Node> nodes = g.nodes();
 		while (nodes.hasNext()) {
@@ -222,72 +228,96 @@ public class AnalysisDirected {
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
 				if (t.getInt("id") > s.getInt("id")) {
-					Set<Node> intersection = new HashSet(
-							(HashSet<Node>) s.get("close"));
+					Set<Node> intersection = new HashSet((HashSet<Node>) s.get("close"));
 					intersection.retainAll((HashSet<Node>) t.get("close"));
-					c += intersection.size();
+					int n = intersection.size();
+					c.Triangles += n;
+					Iterator<Node> i = intersection.iterator();
+					while (i.hasNext())
+					{
+						Node temp = i.next();
+						int k = ((g.getEdge(s,t)==null?0:1)+(g.getEdge(t,s)==null?0:1))*((g.getEdge(s,temp)==null?0:1)+(g.getEdge(temp,s)==null?0:1))*((g.getEdge(temp,t)==null?0:1)+(g.getEdge(t,temp)==null?0:1));
+						s.setInt("Numerator", s.getInt("Numerator")+k);
+						t.setInt("Numerator", t.getInt("Numerator")+k);
+						temp.setInt("Numerator", temp.getInt("Numerator")+k);
+					}
 					((HashSet<Node>) t.get("close")).add(s);
 				}
 			}
 		}
+		Iterator<Node> node = g.nodes();
+		while (node.hasNext())
+		{
+			Node temp = node.next();
+			int n = temp.getDegree();
+			int d = 0;
+			Iterator<Node> I = temp.outNeighbors();
+			while (I.hasNext())
+			{
+				Node t = I.next();
+				if (g.getEdge(t,temp)!=null)
+					d++;
+			}
+			int denominator = 2*((n*(n-1)) - 2*d);
+			temp.setDouble("localClusteringCoefficient", (denominator>0)?(temp.getInt("Numerator"))/(double)denominator:0);
+			c.Clustering += temp.getDouble("localClusteringCoefficient");
+		}
+		c.Clustering /= (double)(g.getNodeCount());
 		return c;
 	}
-
-	public static float triangleBrute(Graph g) {
-		int c = 0;
-		Iterator<Node> i = g.nodes(), j = g.nodes(), k = g.nodes();
-		Node n1, n2, n3;
-		while (i.hasNext()) {
-			n1 = i.next();
-			while (j.hasNext()) {
-				n2 = j.next();
-				while (k.hasNext()) {
-					n3 = k.next();
-					if (g.getEdge(n1, n2) != null && g.getEdge(n2, n3) != null
-							&& g.getEdge(n3, n1) != null)
-						c++;
-				}
-			}
-		}
-		return (float) c / 3.0f;
-	}
-
+	
 	public static int classifyEdges(Graph g) {
 		int sameEdge = 0;
 		Iterator<Edge> i = g.edges();
 		while (i.hasNext()) {
 			Edge temp = i.next();
-			if (temp.getSourceNode().get("value") == temp.getTargetNode().get(
-					"value"))
+			if (temp.getSourceNode().getString("value").equals(temp.getTargetNode().getString("value")))
 				sameEdge++;
 		}
 		return sameEdge;
 	}
 
 	public static void main(String... args) throws DataIOException {
-		Graph polbooks = new GraphMLReader().readGraph("polblogs.xml");
-		polbooks.addColumn("id", int.class);
-		Iterator<Node> n = polbooks.nodes();
+		Graph f = new GraphMLReader().readGraph("polblogs.xml");
+		f.addColumn("id", int.class);
+		Iterator<Node> n = f.nodes();
 		int i = 0;
 		while (n.hasNext()) {
 			n.next().set("id", i++);
 		}
-		Graph g = (Graph) setSCC(polbooks);
-		int c = 0;
-		for (i = 0; i < g.getNodeCount(); ++i)
-			if (g.getNode(i).getInt("size") > 1) {
-				// g = (Graph) g.getNode(i).get("subGraph");
-				// System.out.println(g.getNode(i).getInt("size"));
-				c++;
-				System.out.println(((Graph)g.getNode(i).get("subGraph")).getNodeCount());
+
+
+		tuple t = countTriangles(f);
+		System.out.println("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\"");
+		System.out.println("polblogs.xml,"+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount()));
+		for (int j=1; j<=50; j++)
+		{
+			String filename = "polblogs_rand_"+j+".xml";
+			f = new GraphMLReader().readGraph("polblogs_rand_\\"+filename);
+			f.addColumn("id", int.class);
+			n = f.nodes();
+			i = 0;
+			while(n.hasNext())	{
+				n.next().set("id", i++);
+
 			}
-		System.out.println(g.getNodeCount() + " " + c + " " + triangleBrute(g));
-
-		UILib.setPlatformLookAndFeel();
-		GraphicsEnvironment e = GraphicsEnvironment
-				.getLocalGraphicsEnvironment();
-		JFrame frame = GraphView.demo(g,"id");
-
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			t = countTriangles(f);
+			System.out.println(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount()));
+		}
+//		Graph g = (Graph) setSCC(polbooks);
+//		int c = 0;
+//		for (i = 0; i < g.getNodeCount(); ++i)
+//			if (g.getNode(i).getInt("size") > 1) {
+//				// g = (Graph) g.getNode(i).get("subGraph");
+//				// System.out.println(g.getNode(i).getInt("size"));
+//				c++;
+//		//		System.out.println(((Graph)g.getNode(i).get("subGraph")).getNodeCount());
+//
+//		UILib.setPlatformLookAndFeel();
+//		GraphicsEnvironment e = GraphicsEnvironment
+//				.getLocalGraphicsEnvironment();
+//		JFrame frame = GraphView.demo(g,"id");
+//
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }

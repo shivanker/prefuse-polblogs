@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -23,7 +22,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -63,9 +61,6 @@ import prefuse.render.EdgeRenderer;
 import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
-import prefuse.util.GraphicsLib;
-import prefuse.util.display.DisplayLib;
-import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.force.DragForce;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
@@ -143,10 +138,13 @@ public class graphGamma extends JPanel {
 		// color set for default node
 		int[] palette = new int[] { ColorLib.rgba(255, 200, 200, 250),
 				ColorLib.rgba(200, 255, 200, 250),
+				ColorLib.rgba(255, 200, 125, 250),
 				ColorLib.rgba(200, 200, 255, 250) };
 		// color set for highlighted node
 		int[] palette2 = new int[] { ColorLib.rgba(255, 20, 147, 200),
-				ColorLib.rgba(0, 128, 0, 200), ColorLib.rgba(0, 0, 128, 200) };
+				ColorLib.rgba(0, 128, 0, 200),
+				ColorLib.rgba(225, 150, 100, 200),
+				ColorLib.rgba(0, 0, 128, 200) };
 
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction(nodes, "size",
@@ -256,13 +254,13 @@ public class graphGamma extends JPanel {
 		display.addControlListener(new WheelZoomControl());
 		display.addControlListener(new ZoomToFitControl());
 		display.addControlListener(new NeighborHighlightControl());
-		display.addControlListener(new ToolTipControl(new String[] { "size" }));
+		display.addControlListener(new modToolTip());
 		display.addControlListener(new sccOpener());
 
-//		// overview display
-//		Display overview = new Display(m_vis);
-//		overview.setSize(290, 290);
-//		overview.addItemBoundsListener(new FitOverviewListener());
+		// // overview display
+		// Display overview = new Display(m_vis);
+		// overview.setSize(290, 290);
+		// overview.addItemBoundsListener(new FitOverviewListener());
 
 		// --------------------------------------------------------------------
 		// launch the visualization
@@ -326,7 +324,8 @@ public class graphGamma extends JPanel {
 		display.addControlListener(new ControlAdapter() {
 			public void itemEntered(VisualItem item, MouseEvent e) {
 				if (item instanceof NodeItem) {
-					int size = item.getInt("size"), l = item.getInt("0"), c = item.getInt("1");
+					int size = item.getInt("size"), l = item.getInt("0"), c = item
+							.getInt("1");
 					title.setText("Size of SCC: " + size);
 					value.setText("No. of liberals: " + l);
 					value2.setText("No. of conservatives: " + c);
@@ -415,7 +414,7 @@ public class graphGamma extends JPanel {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
+
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
 			Iterator<Node> n = g.nodes();
@@ -424,12 +423,12 @@ public class graphGamma extends JPanel {
 				n.next().set("id", i++);
 			}
 		}
-		
+
 		return demo(g);
 	}
 
 	public static JFrame demo(Graph g) {
-		
+
 		g = AnalysisDirected.setSCC(g);
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
@@ -439,8 +438,8 @@ public class graphGamma extends JPanel {
 				n.next().set("id", i++);
 			}
 		}
-		
-		final graphGamma view = new graphGamma(g);		
+
+		final graphGamma view = new graphGamma(g);
 
 		// launch window
 		JFrame frame = new JFrame(
@@ -462,26 +461,26 @@ public class graphGamma extends JPanel {
 		return frame;
 	}
 
-//	public static class FitOverviewListener implements ItemBoundsListener {
-//		private Rectangle2D m_bounds = new Rectangle2D.Double();
-//		private Rectangle2D m_temp = new Rectangle2D.Double();
-//		private double m_d = 15;
-//
-//		public void itemBoundsChanged(Display d) {
-//			d.getItemBounds(m_temp);
-//			GraphicsLib.expand(m_temp, 25 / d.getScale());
-//
-//			double dd = m_d / d.getScale();
-//			double xd = Math.abs(m_temp.getMinX() - m_bounds.getMinX());
-//			double yd = Math.abs(m_temp.getMinY() - m_bounds.getMinY());
-//			double wd = Math.abs(m_temp.getWidth() - m_bounds.getWidth());
-//			double hd = Math.abs(m_temp.getHeight() - m_bounds.getHeight());
-//			if (xd > dd || yd > dd || wd > dd || hd > dd) {
-//				m_bounds.setFrame(m_temp);
-//				DisplayLib.fitViewToBounds(d, m_bounds, 0);
-//			}
-//		}
-//	}
+	// public static class FitOverviewListener implements ItemBoundsListener {
+	// private Rectangle2D m_bounds = new Rectangle2D.Double();
+	// private Rectangle2D m_temp = new Rectangle2D.Double();
+	// private double m_d = 15;
+	//
+	// public void itemBoundsChanged(Display d) {
+	// d.getItemBounds(m_temp);
+	// GraphicsLib.expand(m_temp, 25 / d.getScale());
+	//
+	// double dd = m_d / d.getScale();
+	// double xd = Math.abs(m_temp.getMinX() - m_bounds.getMinX());
+	// double yd = Math.abs(m_temp.getMinY() - m_bounds.getMinY());
+	// double wd = Math.abs(m_temp.getWidth() - m_bounds.getWidth());
+	// double hd = Math.abs(m_temp.getHeight() - m_bounds.getHeight());
+	// if (xd > dd || yd > dd || wd > dd || hd > dd) {
+	// m_bounds.setFrame(m_temp);
+	// DisplayLib.fitViewToBounds(d, m_bounds, 0);
+	// }
+	// }
+	// }
 
 	class nodeRenderer extends ShapeRenderer {
 
@@ -494,9 +493,9 @@ public class graphGamma extends JPanel {
 			if (Double.isNaN(y) || Double.isInfinite(y))
 				y = 0;
 			double width = getBaseSize() * item.getSize();
-			
-			if(item instanceof NodeItem)	{
-				width += item.getInt("size")*0.2;
+
+			if (item instanceof NodeItem) {
+				width += item.getInt("size") * 0.25;
 			}
 
 			// Center the shape around the specified x and y
@@ -541,9 +540,26 @@ public class graphGamma extends JPanel {
 
 		public void itemClicked(VisualItem item, MouseEvent e) {
 			if (item instanceof NodeItem)
-				graphAlpha.demo((Graph)item.get("subGraph"), "label");
+				graphAlpha.demo((Graph) item.get("subGraph"), "label");
 		}
 
+	}
+
+	class modToolTip extends ToolTipControl {
+
+		public modToolTip()	{
+			super(new String[0]);
+		}
+		public modToolTip(String field) {
+			super(field);
+		}
+
+		@Override
+		public void itemEntered(VisualItem item, MouseEvent e) {
+			Display d = (Display)e.getSource();
+	            if ( item.canGetString("size") )
+	                d.setToolTipText("Super-node (SCC) of size: " + item.getString("size"));
+		}
 	}
 
 }

@@ -1,4 +1,5 @@
 package assg1;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -8,18 +9,18 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
 
-public class random_g {
+public class rand_edgestoo {
 
 	public static void main(String[] args) throws IOException {
 		// intialise
 		String file_name = "polbooks.xml";
 		int no_of_file = 50;
-		if(args.length>1){
+		if (args.length > 1) {
 			file_name = args[0];
 			no_of_file = Integer.parseInt(args[1]);
 		}
-		
-		String fb = file_name.substring(0,file_name.indexOf('.')) + "_rand_";
+
+		String fb = file_name.substring(0, file_name.indexOf('.')) + "_rand_";
 		String ex = file_name.substring(file_name.indexOf('.'));
 
 		// variables
@@ -33,28 +34,29 @@ public class random_g {
 		}
 		s.close();
 		/* System.out.println(file_str); */
-		
 
 		// Token File
 		long tim = System.currentTimeMillis();
 		String tokens[] = file_str.split(" ");
 		tim = (System.currentTimeMillis() - tim);
-		System.out.println("Time taken to tokenize the File: " + file_name + " "+ tim + " millisec\n\n");
-		
+		System.out.println("Time taken to tokenize the File: " + file_name
+				+ " " + tim + " millisec\n\n");
 
 		// Write File
 		new File(fb).mkdir();
 		Random rgen = new Random();
-		
+
 		for (int k = 1; k <= no_of_file; k++) {
-			System.out.print("File "+k+":  Writing");
-			File file = new File(fb+"\\"+fb+k+ex);
-			Random rand = new Random(System.nanoTime()*rgen.nextLong());
-			
-			int no_of_nodes = 0;
+			System.out.print("File " + k + ":  Writing");
+			File file = new File(fb + "\\" + fb + k + ex);
+			Random rand = new Random(System.nanoTime() * rgen.nextLong());
+
+			int no_of_nodes = 0, no_of_edges = 0;
 			for (int j = 0; j < tokens.length; j++) {
 				if (tokens[j].contains("<node"))
 					no_of_nodes++;
+				else if (tokens[j].contains("<edge"))
+					no_of_edges++;
 			}
 			Writer output = new BufferedWriter(new FileWriter(file));
 			int src = 0;
@@ -62,31 +64,35 @@ public class random_g {
 			HashSet s1 = new HashSet();
 			HashSet h = new HashSet();
 			for (int i = 0; i < tokens.length; i++) {
-				if (tokens[i].contains("source=\"")) {
-					src = rand.nextInt(no_of_nodes);
-					output.write("source=\"" + src + "\" ");
-					s1.add(src);
-				} else if (tokens[i].contains("target=\"")) {
-					while (true) {
-						trg = rand.nextInt(no_of_nodes);
-						if (src == trg)
-							continue;
-						else {
-							s1.add(trg);
-							if (h.contains(s1)) {
+				if (tokens[i].contains("<edge"))	{
+					while(!tokens[++i].contains("/>"));
+					continue;
+				}
+				else if (tokens[i].contains("</graph>")) {
+					for (int r = 3*rgen.nextInt(no_of_edges)/2+1; r > 0; r--) {
+						src = rand.nextInt(no_of_nodes);
+						output.write("<edge source=\"" + src + "\" ");
+						s1.add(src);
+						while (true) {
+							trg = rand.nextInt(no_of_nodes);
+							if (src == trg)
 								continue;
-							} else {
-								h.add(s1);
-								s1 = new HashSet();
-								break;
+							else {
+								s1.add(trg);
+								if (h.contains(s1)) {
+									continue;
+								} else {
+									h.add(s1);
+									s1 = new HashSet();
+									break;
+								}
 							}
 						}
+						output.write("target=\"" + trg + "\"/>\n");
 					}
-					output.write("target=\"" + trg + "\"/>");
-				} else {
-					output.write(tokens[i] + " ");
-				}
 
+				}
+				output.write(tokens[i] + " ");
 			}
 			output.close();
 			System.out.println("......Complete");
