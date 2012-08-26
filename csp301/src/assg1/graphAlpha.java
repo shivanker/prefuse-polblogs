@@ -15,6 +15,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -84,7 +85,9 @@ public class graphAlpha extends JPanel {
 	private static final String graph = "graph";
 	private static final String nodes = "graph.nodes";
 	private static final String edges = "graph.edges";
-
+	private static int degreeMedian;
+	private static int degreeMax;
+	
 	private Visualization m_vis;
 
 	public graphAlpha(Graph g, String label) {
@@ -161,13 +164,6 @@ public class graphAlpha extends JPanel {
 		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,ColorLib.gray(0));
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
 
-		// outlines of nodes
-		ColorAction nStroke = new ColorAction(nodes, VisualItem.STROKECOLOR);
-		nStroke.setDefaultColor(ColorLib.gray(50));
-		nStroke.add("_hover", ColorLib.gray(10));
-		nStroke.add(VisualItem.HIGHLIGHT, ColorLib.gray(10));
-		nStroke.add("ingroup('_search')", ColorLib.gray(10));
-
 		// use light grey for edges
 		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(200));
 		// use dark light grey for edges
@@ -211,7 +207,7 @@ public class graphAlpha extends JPanel {
 		color.add(text);
 		color.add(edge);
 		color.add(edge1);
-		color.add(nStroke);
+		color.add(new graphBeta.borderColorFunction(nodes, degreeMedian));
 		color.add(new RepaintAction());
 
 		ActionList animate = new ActionList(30000);
@@ -437,6 +433,16 @@ public class graphAlpha extends JPanel {
 				n.next().set("id", i++);
 			}
 		}
+		
+		int[] degs = new int[g.getNodeCount()];
+		g.addColumn("degree", int.class);
+		for(int i=0; i < g.getNodeCount(); ++i)	{
+			g.getNode(i).set("degree", g.getDegree(i));
+			degs[i] = g.getDegree(i);
+		}
+		Arrays.sort(degs);
+		degreeMedian = degs[(degs.length-1)/2];
+		degreeMax = degs[degs.length - 1];
 
 		final graphAlpha view = new graphAlpha(g, label);
 
