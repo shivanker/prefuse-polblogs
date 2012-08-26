@@ -165,6 +165,7 @@ public class AnalysisDirected {
 		int i = 0;
 		while(in.hasNext())	{
 			Node t = in.next();
+			
 			if(!t.edges().hasNext())
 				sccG.removeNode(t);
 			else	{
@@ -184,6 +185,8 @@ public class AnalysisDirected {
 			Edge a = ed.next();
 			sg2.addEdge(a.getSourceNode().getInt("id"), a.getTargetNode().getInt("id"));
 		}
+		
+		
 		
 		return sg2;
 	}
