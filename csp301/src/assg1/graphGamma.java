@@ -244,7 +244,7 @@ public class graphGamma extends JPanel {
 		display.setSize(1000, 700);
 		display.pan(500, 350);
 		// display.setBackgroundImage(img, true, true);
-		display.zoom(new Point2D.Float(500, 350), 1.5);
+		display.zoom(new Point2D.Float(500, 350), 1.1);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
 
@@ -398,8 +398,8 @@ public class graphGamma extends JPanel {
 				.getLocalGraphicsEnvironment();
 		JFrame frame = demo(datafile);
 
-		//frame.setMaximizedBounds(e.getMaximumWindowBounds());
-		//frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		frame.setMaximizedBounds(e.getMaximumWindowBounds());
+		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
