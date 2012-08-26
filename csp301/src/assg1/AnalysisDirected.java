@@ -296,8 +296,8 @@ public class AnalysisDirected {
 
 
 		tuple t = countTriangles(f);
-		System.out.println("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\"");
-		System.out.println("polblogs.xml,"+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount()));
+		System.out.println("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
+		System.out.println("polblogs.xml,"+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
 		for (int j=1; j<=50; j++)
 		{
 			String filename = "polblogs_rand_"+j+".xml";
@@ -310,7 +310,7 @@ public class AnalysisDirected {
 
 			}
 			t = countTriangles(f);
-			System.out.println(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount()));
+			System.out.println(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
 		}
 //		Graph g = (Graph) setSCC(polbooks);
 //		int c = 0;
