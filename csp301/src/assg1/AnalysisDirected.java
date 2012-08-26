@@ -270,8 +270,7 @@ public class AnalysisDirected {
 		Iterator<Edge> i = g.edges();
 		while (i.hasNext()) {
 			Edge temp = i.next();
-			if (temp.getSourceNode().get("value") == temp.getTargetNode().get(
-					"value"))
+			if (temp.getSourceNode().getString("value").equals(temp.getTargetNode().getString("value")))
 				sameEdge++;
 		}
 		return sameEdge;
