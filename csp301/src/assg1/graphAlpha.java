@@ -419,6 +419,7 @@ public class graphAlpha extends JPanel {
 		Graph g = null;
 		try {
 			g = new GraphMLReader().readGraph(datafile);
+			System.out.print(g.isDirected());
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);

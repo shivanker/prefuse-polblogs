@@ -281,7 +281,7 @@ public class graphBeta extends JPanel {
 		cf.setBorder(BorderFactory.createTitledBorder("Connectivity Filter"));
 		fpanel.add(cf);
 
-		JSearchPanel search = new JSearchPanel(m_vis, nodes, "label", true,true);
+		JSearchPanel search = new JSearchPanel(m_vis, nodes, label, true,true);
 		search.setShowResultCount(true);
 		search.setBorder(BorderFactory.createEmptyBorder(5, 5, 4, 0));
 		search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
