@@ -85,7 +85,7 @@ public class AnalysisUndirected {
 			temp.setDouble("localClusteringCoefficient", (n>1)?(2*temp.getInt("Triangles"))/((double)n*(n-1)):0);
 			c.Clustering += temp.getDouble("localClusteringCoefficient");
 			Triangles[i] = temp.getInt("Triangles");
-			Degrees[i] = temp.getDegree();
+			Degrees[i++] = temp.getDegree();
 		}
 		c.Clustering /= (double)(g.getNodeCount());
 		c.Pearson = st.PearsonStatistic(Triangles, Degrees);

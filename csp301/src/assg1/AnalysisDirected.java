@@ -246,6 +246,9 @@ public class AnalysisDirected {
 			}
 		}
 		Iterator<Node> node = g.nodes();
+		int [] Triangles = new int[g.getNodeCount()];
+		int [] Degrees = new int[g.getNodeCount()];
+		int i = 0;
 		while (node.hasNext())
 		{
 			Node temp = node.next();
@@ -261,8 +264,13 @@ public class AnalysisDirected {
 			int denominator = 2*((n*(n-1)) - 2*d);
 			temp.setDouble("localClusteringCoefficient", (denominator>0)?(temp.getInt("Numerator"))/(double)denominator:0);
 			c.Clustering += temp.getDouble("localClusteringCoefficient");
+			Triangles[i] = temp.getInt("Triangles");
+			Degrees[i++] = temp.getDegree();
 		}
 		c.Clustering /= (double)(g.getNodeCount());
+		Statistics st = new Statistics();
+		c.Pearson = st.PearsonStatistic(Triangles, Degrees);
+		c.Spearman = st.SpearmanStatistic(Triangles, Degrees);
 		return c;
 	}
 	
