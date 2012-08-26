@@ -97,12 +97,12 @@ public class graphBeta extends JPanel {
 		// ShapeRenderer sr = new ShapeRenderer();
 		// LabelRenderer tr = new LabelRenderer();
 		// tr.setRoundedCorner(20, 20);
+		
 		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,Constants.EDGE_ARROW_FORWARD);
-				
 		nodeRenderer nr = new nodeRenderer();
 		m_vis.setRendererFactory(new DefaultRendererFactory(nr,er));
 		
-		
+		er.setDefaultLineWidth(0.5);
 
 		// --------------------------------------------------------------------
 		// register the data with a visualization
@@ -164,7 +164,14 @@ public class graphBeta extends JPanel {
 		nStroke.add("ingroup('_search')", ColorLib.gray(100));
 
 		// use light grey for edges
-		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(225));
+		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(200));
+		// use dark light grey for edges
+		ColorAction edge1 = new ColorAction(edges, VisualItem.FILLCOLOR,ColorLib.gray(150));
+		
+		ColorAction edge2 = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(50));
+		ColorAction edge3 = new ColorAction(edges, VisualItem.FILLCOLOR,ColorLib.gray(50));
+		edge.add(VisualItem.HIGHLIGHT,edge2);
+		edge1.add(VisualItem.HIGHLIGHT, edge3);
 		
 		// animate paint change
 		ActionList animatePaint = new ActionList(1000);
@@ -200,6 +207,7 @@ public class graphBeta extends JPanel {
 		color.add(fill);
 		color.add(text);
 		color.add(edge);
+		color.add(edge1);
 		color.add(nStroke);
 		color.add(new RepaintAction());
 		
@@ -217,7 +225,7 @@ public class graphBeta extends JPanel {
 		
 		Image img=null;
 		try{
-			img = ImageIO.read(new File("test1.jpg"));
+			img = ImageIO.read(new File("test2.jpg"));
 		}
 		catch(IOException e){
 			System.out.println("Background Image File Not Found");
@@ -228,7 +236,7 @@ public class graphBeta extends JPanel {
 		Display display = new Display(m_vis);
 		display.setSize(700, 700);
 		display.pan(500, 350);
-		display.setBackgroundImage(img, true, true);
+		//display.setBackgroundImage(img, true, true);
 		display.zoom(new Point2D.Float(500,350),1.5);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.WHITE);
