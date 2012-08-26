@@ -116,7 +116,9 @@ public class AnalysisUndirected {
 		}
 		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
 		bw.write("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
+		bw.newLine();
 		bw.write("polbooks.xml,"+(((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+		bw.newLine();
 		for (int j=1; j<=50; j++)
 		{
 			String filename = "polbooks_rand_"+j+".xml";
@@ -129,6 +131,7 @@ public class AnalysisUndirected {
 			}
 			t = countTrianglesAndNetworkClusteringCoefficient(g);
 			bw.write((filename+","+((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+			bw.newLine();
 		}
 		bw.close();
 	}

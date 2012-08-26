@@ -216,6 +216,7 @@ public class AnalysisDirected {
 	public static tuple countTriangles(Graph g) {
 		tuple c = new tuple(0,0.0);
 		g.addColumn("Numerator", int.class, 0);
+		g.addColumn("Triangles", int.class, 0);
 		g.addColumn("localClusteringCoefficient", double.class, 0);
 		g.addColumn("close", HashSet.class, null);
 		for(int i=0; i<g.getNodeCount(); ++i)
@@ -231,6 +232,8 @@ public class AnalysisDirected {
 					intersection.retainAll((HashSet<Node>) t.get("close"));
 					int n = intersection.size();
 					c.Triangles += n;
+					s.setInt("Triangles", s.getInt("Triangles")+n);
+					t.setInt("Triangles", t.getInt("Triangles")+n);
 					Iterator<Node> i = intersection.iterator();
 					while (i.hasNext())
 					{
@@ -239,6 +242,7 @@ public class AnalysisDirected {
 						s.setInt("Numerator", s.getInt("Numerator")+k);
 						t.setInt("Numerator", t.getInt("Numerator")+k);
 						temp.setInt("Numerator", temp.getInt("Numerator")+k);
+						temp.setInt("Triangles", temp.getInt("Triangles")+1);
 					}
 					((HashSet<Node>) t.get("close")).add(s);
 				}
@@ -295,7 +299,9 @@ public class AnalysisDirected {
 		BufferedWriter bw = new BufferedWriter(new FileWriter("polblogsAnalysis.csv"));
 		tuple t = countTriangles(f);
 		bw.write("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
-		bw.write("polblogs.xml,"+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+		bw.newLine();
+		bw.write("polblogs.xml,"+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+		bw.newLine();
 		for (int j=1; j<=50; j++)
 		{
 			String filename = "polblogs_rand_"+j+".xml";
@@ -309,6 +315,7 @@ public class AnalysisDirected {
 			}
 			t = countTriangles(f);
 			bw.write(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+			bw.newLine();
 		}
 //		Graph g = (Graph) setSCC(polbooks);
 //		int c = 0;
