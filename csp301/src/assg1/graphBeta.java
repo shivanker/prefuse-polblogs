@@ -86,7 +86,7 @@ public class graphBeta extends JPanel {
 	private static final String graph = "graph";
 	private static final String nodes = "graph.nodes";
 	private static final String edges = "graph.edges";
-	private static int degreeMedian, degreeMax;
+	private static int degreeMedian;
 	private Visualization m_vis;
 
 	public graphBeta(Graph g, String label) {
@@ -410,9 +410,7 @@ public class graphBeta extends JPanel {
 			g.getNode(i).set("degree", g.getDegree(i));
 			degs[i] = g.getDegree(i);
 		}
-		Arrays.sort(degs);
-		degreeMedian = degs[(degs.length-1)/2];
-		degreeMax = degs[degs.length - 1];
+		degreeMedian = Statistics.median(degs, 0, degs.length-1);
 		
 		final graphBeta view = new graphBeta(g, label);
 

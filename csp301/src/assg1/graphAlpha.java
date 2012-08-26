@@ -86,7 +86,6 @@ public class graphAlpha extends JPanel {
 	private static final String nodes = "graph.nodes";
 	private static final String edges = "graph.edges";
 	private static int degreeMedian;
-	private static int degreeMax;
 	
 	private Visualization m_vis;
 
@@ -440,10 +439,8 @@ public class graphAlpha extends JPanel {
 			g.getNode(i).set("degree", g.getDegree(i));
 			degs[i] = g.getDegree(i);
 		}
-		Arrays.sort(degs);
-		degreeMedian = degs[(degs.length-1)/2];
-		degreeMax = degs[degs.length - 1];
-
+		degreeMedian = Statistics.median(degs, 0, degs.length-1);
+		
 		final graphAlpha view = new graphAlpha(g, label);
 
 		// launch window
