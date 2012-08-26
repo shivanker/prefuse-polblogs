@@ -65,6 +65,7 @@ import prefuse.util.GraphicsLib;
 import prefuse.util.display.DisplayLib;
 import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.force.DragForce;
+import prefuse.util.force.EulerIntegrator;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
 import prefuse.util.force.SpringForce;
@@ -98,19 +99,19 @@ public class graphAlpha extends JPanel {
 		// LabelRenderer tr = new LabelRenderer();
 		// tr.setRoundedCorner(20, 20);
 		
-		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,Constants.EDGE_ARROW_REVERSE);
+		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,Constants.EDGE_ARROW_FORWARD);
 		nodeRenderer nr = new nodeRenderer();
 		m_vis.setRendererFactory(new DefaultRendererFactory(nr,er));
 		
 		er.setArrowHeadSize(5, 5);
-		er.setDefaultLineWidth(0.5);
+		er.setDefaultLineWidth(0.1);
 		
 		
 
 		// --------------------------------------------------------------------
 		// register the data with a visualization
 		// adds graph to visualization and sets renderer label field
-		setGraph(g, label);
+		setGraph(g);
 
 		// fix selected focus nodes
 		TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS);
@@ -372,7 +373,7 @@ public class graphAlpha extends JPanel {
 
 	}
 
-	public void setGraph(Graph g, String label) {
+	public void setGraph(Graph g) {
 
 		// update graph
 		m_vis.removeGroup(graph);
@@ -497,14 +498,14 @@ public class graphAlpha extends JPanel {
 				y = y - width / 2;
 			}
 
-			if (!item.canGet("value", String.class))
-				return ellipse(x, y, width, width);
-			String v = "" + item.get("value");
-			if (v.equals("c"))
-				return rectangle(x, y, width, width);
-			else if (v.equals("n"))
-				return triangle_down((float) x, (float) y, (float) width);
-			else
+//			if (!item.canGet("value", String.class))
+//				return ellipse(x, y, width, width);
+//			String v = "" + item.get("value");
+//			if (v.equals("c"))
+//				return rectangle(x, y, width, width);
+//			else if (v.equals("n"))
+//				return triangle_down((float) x, (float) y, (float) width);
+//			else
 				return ellipse(x, y, width, width);
 
 			// switch ( stype ) {

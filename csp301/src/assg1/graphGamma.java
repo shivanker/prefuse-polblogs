@@ -88,7 +88,7 @@ public class graphGamma extends JPanel {
 
 	private Visualization m_vis;
 
-	public graphGamma(Graph g, String label) {
+	public graphGamma(Graph g) {
 		super(new BorderLayout());
 
 		// create a new, empty visualization for our data
@@ -101,17 +101,17 @@ public class graphGamma extends JPanel {
 		// tr.setRoundedCorner(20, 20);
 
 		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,
-				Constants.EDGE_ARROW_REVERSE);
+				Constants.EDGE_ARROW_FORWARD);
 		nodeRenderer nr = new nodeRenderer();
 		m_vis.setRendererFactory(new DefaultRendererFactory(nr, er));
 
 		er.setArrowHeadSize(5, 5);
-		er.setDefaultLineWidth(0.5);
+		er.setDefaultLineWidth(0.7);
 
 		// --------------------------------------------------------------------
 		// register the data with a visualization
 		// adds graph to visualization and sets renderer label field
-		setGraph(g, label);
+		setGraph(g);
 
 		// fix selected focus nodes
 		TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS);
@@ -149,9 +149,9 @@ public class graphGamma extends JPanel {
 				ColorLib.rgba(0, 128, 0, 200), ColorLib.rgba(0, 0, 128, 200) };
 
 		// map nominal data values to colors using our provided palette
-		DataColorAction fill = new DataColorAction(nodes, "value",
+		DataColorAction fill = new DataColorAction(nodes, "size",
 				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		DataColorAction fill2 = new DataColorAction(nodes, "value",
+		DataColorAction fill2 = new DataColorAction(nodes, "size",
 				Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
 		fill.add(VisualItem.FIXED, ColorLib.rgba(0, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, fill2);
@@ -206,7 +206,7 @@ public class graphGamma extends JPanel {
 		draw.add(new RepaintAction());
 
 		ForceSimulator fsim = new ForceSimulator();
-		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
+		//fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
 		fsim.addForce(new SpringForce());
 		fsim.addForce(new DragForce(0.015f));
 
@@ -228,7 +228,7 @@ public class graphGamma extends JPanel {
 		// we can later execute our Actions by invoking a method on our
 		// Visualization, using the name we've chosen below.
 		m_vis.putAction("draw", draw);
-		m_vis.putAction("layout", animate);
+		//m_vis.putAction("layout", animate);
 		m_vis.runAfter("draw", "layout");
 		m_vis.putAction("layout", color);
 
@@ -236,7 +236,7 @@ public class graphGamma extends JPanel {
 		try {
 			img = ImageIO.read(new File("test1.jpg"));
 		} catch (IOException e) {
-			System.out.println("Background Image File Not Found");
+			System.err.println("Background Image File Not Found");
 		}
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
@@ -256,12 +256,13 @@ public class graphGamma extends JPanel {
 		display.addControlListener(new WheelZoomControl());
 		display.addControlListener(new ZoomToFitControl());
 		display.addControlListener(new NeighborHighlightControl());
-		display.addControlListener(new ToolTipControl(new String[] { "label" }));
+		display.addControlListener(new ToolTipControl(new String[] { "size" }));
+		display.addControlListener(new sccOpener());
 
-		// overview display
-		Display overview = new Display(m_vis);
-		overview.setSize(290, 290);
-		overview.addItemBoundsListener(new FitOverviewListener());
+//		// overview display
+//		Display overview = new Display(m_vis);
+//		overview.setSize(290, 290);
+//		overview.addItemBoundsListener(new FitOverviewListener());
 
 		// --------------------------------------------------------------------
 		// launch the visualization
@@ -325,18 +326,10 @@ public class graphGamma extends JPanel {
 		display.addControlListener(new ControlAdapter() {
 			public void itemEntered(VisualItem item, MouseEvent e) {
 				if (item instanceof NodeItem) {
-					String label = item.getString("label");
-					String aff = "" + item.get("value");
-					String source = "" + item.get("source");
-					if (aff.equals("0"))
-						aff = "Conservative";
-					else if (aff.equals("1"))
-						aff = "Neutral";
-					else
-						aff = "Liberal";
-					title.setText(label);
-					value.setText("Affiliation: " + aff);
-					value2.setText("Source: " + source);
+					int size = item.getInt("size"), l = item.getInt("0"), c = item.getInt("1");
+					title.setText("Size of SCC: " + size);
+					value.setText("No. of liberals: " + l);
+					value2.setText("No. of conservatives: " + c);
 				} else
 					title.setText(":O");
 			}
@@ -345,19 +338,18 @@ public class graphGamma extends JPanel {
 				title.setText(null);
 				value.setText(null);
 				value2.setText(null);
-
 			}
 		});
 
 		Box box = UILib.getBox(
 				new Component[] { title, value, value2, search }, false, 10, 3,
 				0);
-		box.setBorder(BorderFactory.createTitledBorder("Node Info"));
+		box.setBorder(BorderFactory.createTitledBorder("SCC Info"));
 		box.setMaximumSize(new Dimension(310, 90));
 
 		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
-		fpanel.add(overview);
+		// fpanel.add(overview);
 
 		// Box radioBox = new Box(BoxLayout.X_AXIS);
 		// UILib.setFont(radioBox, FontLib.getFont("Tahoma", 15));
@@ -380,7 +372,7 @@ public class graphGamma extends JPanel {
 
 	}
 
-	public void setGraph(Graph g, String label) {
+	public void setGraph(Graph g) {
 
 		// update graph
 		m_vis.removeGroup(graph);
@@ -399,42 +391,31 @@ public class graphGamma extends JPanel {
 
 		// create graphGamma
 		String datafile = "polblogs.xml";
-		String label = "label";
-		if (args.length > 1) {
+		if (args.length > 0) {
 			datafile = args[0];
-			label = args[1];
 		}
 		GraphicsEnvironment e = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
-		JFrame frame = demo(datafile, label);
+		JFrame frame = demo(datafile);
 
-		frame.setMaximizedBounds(e.getMaximumWindowBounds());
-		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		//frame.setMaximizedBounds(e.getMaximumWindowBounds());
+		//frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// frame.setVisible(true);
 	}
 
-	public static JFrame demo() {
-		return demo((String) null, "label");
-	}
-
-	public static JFrame demo(String datafile, String label) {
+	public static JFrame demo(String datafile) {
 		Graph g = null;
 		try {
 			g = new GraphMLReader().readGraph(datafile);
-			System.out.print(g.isDirected());
+			// System.out.print(g.isDirected());
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
-
-		return demo(g, label);
-	}
-
-	public static JFrame demo(Graph g, String label) {
-
+		
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
 			Iterator<Node> n = g.nodes();
@@ -443,12 +424,27 @@ public class graphGamma extends JPanel {
 				n.next().set("id", i++);
 			}
 		}
+		
+		return demo(g);
+	}
 
-		final graphGamma view = new graphGamma(g, label);
+	public static JFrame demo(Graph g) {
+		
+		g = AnalysisDirected.setSCC(g);
+		if (!g.getNode(0).canGetInt("id")) {
+			g.addColumn("id", int.class);
+			Iterator<Node> n = g.nodes();
+			int i = 0;
+			while (n.hasNext()) {
+				n.next().set("id", i++);
+			}
+		}
+		
+		final graphGamma view = new graphGamma(g);		
 
 		// launch window
 		JFrame frame = new JFrame(
-				"c s p 3 0 1  |  a s s i g n m e n t 1 | p o l b l o g s");
+				"c s p 3 0 1  |  a s s i g n m e n t 1 | p o l b l o g s | Strongly Connected Components");
 		frame.setContentPane(view);
 		frame.pack();
 		frame.setVisible(true);
@@ -466,26 +462,26 @@ public class graphGamma extends JPanel {
 		return frame;
 	}
 
-	public static class FitOverviewListener implements ItemBoundsListener {
-		private Rectangle2D m_bounds = new Rectangle2D.Double();
-		private Rectangle2D m_temp = new Rectangle2D.Double();
-		private double m_d = 15;
-
-		public void itemBoundsChanged(Display d) {
-			d.getItemBounds(m_temp);
-			GraphicsLib.expand(m_temp, 25 / d.getScale());
-
-			double dd = m_d / d.getScale();
-			double xd = Math.abs(m_temp.getMinX() - m_bounds.getMinX());
-			double yd = Math.abs(m_temp.getMinY() - m_bounds.getMinY());
-			double wd = Math.abs(m_temp.getWidth() - m_bounds.getWidth());
-			double hd = Math.abs(m_temp.getHeight() - m_bounds.getHeight());
-			if (xd > dd || yd > dd || wd > dd || hd > dd) {
-				m_bounds.setFrame(m_temp);
-				DisplayLib.fitViewToBounds(d, m_bounds, 0);
-			}
-		}
-	}
+//	public static class FitOverviewListener implements ItemBoundsListener {
+//		private Rectangle2D m_bounds = new Rectangle2D.Double();
+//		private Rectangle2D m_temp = new Rectangle2D.Double();
+//		private double m_d = 15;
+//
+//		public void itemBoundsChanged(Display d) {
+//			d.getItemBounds(m_temp);
+//			GraphicsLib.expand(m_temp, 25 / d.getScale());
+//
+//			double dd = m_d / d.getScale();
+//			double xd = Math.abs(m_temp.getMinX() - m_bounds.getMinX());
+//			double yd = Math.abs(m_temp.getMinY() - m_bounds.getMinY());
+//			double wd = Math.abs(m_temp.getWidth() - m_bounds.getWidth());
+//			double hd = Math.abs(m_temp.getHeight() - m_bounds.getHeight());
+//			if (xd > dd || yd > dd || wd > dd || hd > dd) {
+//				m_bounds.setFrame(m_temp);
+//				DisplayLib.fitViewToBounds(d, m_bounds, 0);
+//			}
+//		}
+//	}
 
 	class nodeRenderer extends ShapeRenderer {
 
@@ -499,9 +495,9 @@ public class graphGamma extends JPanel {
 				y = 0;
 			double width = getBaseSize() * item.getSize();
 			
-			if(item instanceof NodeItem)	{
-				width += item.getInt("size");
-			}
+//			if(item instanceof NodeItem)	{
+//				width += item.getInt("size");
+//			}
 
 			// Center the shape around the specified x and y
 			if (width > 1) {
@@ -509,15 +505,7 @@ public class graphGamma extends JPanel {
 				y = y - width / 2;
 			}
 
-			if (!item.canGet("value", String.class))
-				return ellipse(x, y, width, width);
-			String v = "" + item.get("value");
-			if (v.equals("c"))
-				return rectangle(x, y, width, width);
-			else if (v.equals("n"))
-				return triangle_down((float) x, (float) y, (float) width);
-			else
-				return ellipse(x, y, width, width);
+			return ellipse(x, y, width, width);
 
 			// switch ( stype ) {
 			// case Constants.SHAPE_NONE:
@@ -552,11 +540,8 @@ public class graphGamma extends JPanel {
 	class sccOpener extends ControlAdapter implements Control {
 
 		public void itemClicked(VisualItem item, MouseEvent e) {
-			if (item instanceof NodeItem) {
-				
-				JFrame frame = graphAlpha.demo((Graph)item.get("subGraph"), "label");
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			}
+			if (item instanceof NodeItem)
+				graphAlpha.demo((Graph)item.get("subGraph"), "label");
 		}
 
 	}

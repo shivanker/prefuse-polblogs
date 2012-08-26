@@ -65,6 +65,7 @@ import prefuse.util.GraphicsLib;
 import prefuse.util.display.DisplayLib;
 import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.force.DragForce;
+import prefuse.util.force.EulerIntegrator;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
 import prefuse.util.force.SpringForce;
@@ -107,7 +108,7 @@ public class graphBeta extends JPanel {
 		// --------------------------------------------------------------------
 		// register the data with a visualization
 		// adds graph to visualization and sets renderer label field
-		setGraph(g, label);
+		setGraph(g);
 
 		// fix selected focus nodes
 		TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS);
@@ -352,7 +353,7 @@ public class graphBeta extends JPanel {
 
 	}
 
-	public void setGraph(Graph g, String label) {
+	public void setGraph(Graph g) {
 		
 		// update graph
 		m_vis.removeGroup(graph);
