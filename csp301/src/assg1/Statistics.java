@@ -9,7 +9,25 @@ public class Statistics
 			XY[i] = X[i] * Y[i];
 		return (mean(XY) - mean(X)*mean(Y));
 	}
-	
+	public static double SpearmanStatistic(double[] X, double[] Y)
+	{
+		double xmean = mean(X);
+		double ymean = mean(Y);
+		double num = 0;
+		double den1 = 0;
+		double den2 = 0;
+		for (int i=0; i<X.length; i++)
+		{
+			num += ((X[i]-xmean)*(Y[i]-ymean));
+			den1 += ((X[i]-xmean)*(X[i]-xmean));
+			den2 += ((Y[i]-ymean)*(Y[i]-ymean));
+		}
+		return (num/Math.sqrt(den1*den2));
+	}
+	public static double PearsonStatistic(double[] X, double[] Y)
+	{
+		return (covariance(X,Y)/Math.sqrt(covariance(X,X)*covariance(Y,Y)));
+	}
 	public static double mean(double[] X)
 	{
 		double sum = 0;
