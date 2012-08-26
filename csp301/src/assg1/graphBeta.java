@@ -224,13 +224,13 @@ public class graphBeta extends JPanel {
 		m_vis.runAfter("draw", "layout");
 		m_vis.putAction("layout", color);
 		
-		Image img=null;
-		try{
-			img = ImageIO.read(new File("test2.jpg"));
-		}
-		catch(IOException e){
-			System.out.println("Background Image File Not Found");
-		}
+//		Image img=null;
+//		try{
+//			img = ImageIO.read(new File("test5.jpg"));
+//		}
+//		catch(IOException e){
+//			System.out.println("Background Image File Not Found");
+//		}
 		// ----
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
