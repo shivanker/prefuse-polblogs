@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -23,7 +22,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -63,9 +61,6 @@ import prefuse.render.EdgeRenderer;
 import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
-import prefuse.util.GraphicsLib;
-import prefuse.util.display.DisplayLib;
-import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.force.DragForce;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
@@ -259,7 +254,7 @@ public class graphGamma extends JPanel {
 		display.addControlListener(new WheelZoomControl());
 		display.addControlListener(new ZoomToFitControl());
 		display.addControlListener(new NeighborHighlightControl());
-		display.addControlListener(new ToolTipControl(new String[] { "size" }));
+		display.addControlListener(new modToolTip());
 		display.addControlListener(new sccOpener());
 
 		// // overview display
@@ -552,28 +547,19 @@ public class graphGamma extends JPanel {
 	}
 
 	class modToolTip extends ToolTipControl {
-		public modToolTip(String[] f) {
-			super(f);
+
+		public modToolTip()	{
+			super(new String[0]);
+		}
+		public modToolTip(String field) {
+			super(field);
 		}
 
 		@Override
 		public void itemEntered(VisualItem item, MouseEvent e) {
 			Display d = (Display)e.getSource();
-	        if ( label.length == 1 ) {
-	            // optimize the simple case
-	            if ( item.canGetString(label[0]) )
-	                d.setToolTipText(item.getString(label[0]));
-	        } else {
-	            sbuf.delete(0, sbuf.length());
-	            for ( int i=0; i<label.length; ++i ) {
-	                if ( item.canGetString(label[i]) ) {
-	                    if ( sbuf.length() > 0 )
-	                        sbuf.append("; ");
-	                    sbuf.append(item.getString(label[i]));
-	                }
-	            }
-	            d.setToolTipText(sbuf.toString());
-	        }
+	            if ( item.canGetString("size") )
+	                d.setToolTipText("Super-node (SCC) of size: " + item.getString("size"));
 		}
 	}
 
