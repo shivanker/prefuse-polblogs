@@ -15,7 +15,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -62,10 +64,10 @@ import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
 import prefuse.util.GraphicsLib;
+import prefuse.util.MathLib;
 import prefuse.util.display.DisplayLib;
 import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.force.DragForce;
-import prefuse.util.force.EulerIntegrator;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
 import prefuse.util.force.SpringForce;
@@ -84,7 +86,7 @@ public class graphBeta extends JPanel {
 	private static final String graph = "graph";
 	private static final String nodes = "graph.nodes";
 	private static final String edges = "graph.edges";
-
+	private static int degreeMedian, degreeMax;
 	private Visualization m_vis;
 
 	public graphBeta(Graph g, String label) {
@@ -95,9 +97,6 @@ public class graphBeta extends JPanel {
 
 		// --------------------------------------------------------------------
 		// set up the renderers
-		// ShapeRenderer sr = new ShapeRenderer();
-		// LabelRenderer tr = new LabelRenderer();
-		// tr.setRoundedCorner(20, 20);
 		
 		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,Constants.EDGE_ARROW_FORWARD);
 		nodeRenderer nr = new nodeRenderer();
@@ -140,7 +139,7 @@ public class graphBeta extends JPanel {
 				ColorLib.rgba(200, 200, 255, 250) 
 				};
 		// color set for highlighted node
-		int[] palette2 = new int[] { 
+		int[] palette2 = new int[] {
 				ColorLib.rgba(255, 20, 147,200),
 				ColorLib.rgba(0, 128, 0,200), 
 				ColorLib.rgba(0, 0, 128, 200) 
@@ -156,13 +155,6 @@ public class graphBeta extends JPanel {
 		// use white for node text
 		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,ColorLib.gray(0));
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
-
-		// outlines of nodes
-		ColorAction nStroke = new ColorAction(nodes, VisualItem.STROKECOLOR);
-		nStroke.setDefaultColor(ColorLib.gray(150));
-		nStroke.add("_hover", ColorLib.gray(100));
-		nStroke.add(VisualItem.HIGHLIGHT, ColorLib.gray(100));
-		nStroke.add("ingroup('_search')", ColorLib.gray(100));
 
 		// use light grey for edges
 		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(200));
@@ -209,7 +201,7 @@ public class graphBeta extends JPanel {
 		color.add(text);
 		color.add(edge);
 		color.add(edge1);
-		color.add(nStroke);
+		color.add(new borderColorFunction(nodes, degreeMedian));
 		color.add(new RepaintAction());
 		
 		ActionList animate = new ActionList(Activity.INFINITY);
@@ -231,14 +223,14 @@ public class graphBeta extends JPanel {
 		catch(IOException e){
 			System.out.println("Background Image File Not Found");
 		}
-		// ----
+
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
 		Display display = new Display(m_vis);
 		display.setSize(700, 700);
 		display.pan(500, 350);
 		//display.setBackgroundImage(img, true, true);
-		display.zoom(new Point2D.Float(500,350),1.5);
+		display.zoom(new Point2D.Float(500,350),1.75);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.WHITE);
 
@@ -390,8 +382,6 @@ public class graphBeta extends JPanel {
 		
 		frame.setMaximizedBounds(e.getMaximumWindowBounds());
 		frame.setExtendedState( frame.getExtendedState()|JFrame.MAXIMIZED_BOTH );
-		//frame.setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("test.jpg")))));
-		//frame.setBackground(Color.GREEN);		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
@@ -422,6 +412,15 @@ public class graphBeta extends JPanel {
 			}
 		}
 		
+		int[] degs = new int[g.getNodeCount()];
+		g.addColumn("degree", int.class);
+		for(int i=0; i < g.getNodeCount(); ++i)	{
+			g.getNode(i).set("degree", g.getDegree(i));
+			degs[i] = g.getDegree(i);
+		}
+		Arrays.sort(degs);
+		degreeMedian = degs[(degs.length-1)/2];
+		degreeMax = degs[degs.length - 1];
 		
 		final graphBeta view = new graphBeta(g, label);
 
@@ -494,34 +493,26 @@ public class graphBeta extends JPanel {
 			else
 				return ellipse(x, y, width, width);
 
-			// switch ( stype ) {
-			// case Constants.SHAPE_NONE:
-			// return null;
-			// case Constants.SHAPE_RECTANGLE:
-			// return rectangle(x, y, width, width);
-			// case Constants.SHAPE_ELLIPSE:
-			// return ellipse(x, y, width, width);
-			// case Constants.SHAPE_TRIANGLE_UP:
-			// return triangle_up((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_DOWN:
-			// return triangle_down((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_LEFT:
-			// return triangle_left((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_RIGHT:
-			// return triangle_right((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_CROSS:
-			// return cross((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_STAR:
-			// return star((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_HEXAGON:
-			// return hexagon((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_DIAMOND:
-			// return diamond((float)x, (float)y, (float)width);
-			// default:
-			// throw new IllegalStateException("Unknown shape type: "+stype);
-			// }
 		}
 
+	}
+	
+	static class borderColorFunction extends ColorAction	{
+	
+		int degreeMedian;
+		public borderColorFunction(String group, int degMed)	{
+			super(group, VisualItem.STROKECOLOR);
+			degreeMedian = degMed;
+		}
+		
+		public int getColor(VisualItem item) {
+			NodeItem n = (NodeItem)item;
+			if(n.getInt("degree") > 3*degreeMedian)
+				return ColorLib.gray(0);
+			if(n.isHover() || n.isHighlighted() || n.isInGroup(Visualization.SEARCH_ITEMS))
+				return ColorLib.gray(100);
+			return ColorLib.gray(150);
+		}
 	}
 
 }
