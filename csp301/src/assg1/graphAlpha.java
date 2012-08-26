@@ -120,17 +120,14 @@ public class graphAlpha extends JPanel {
 			public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
 				for (int i = 0; i < rem.length; ++i)
 					((VisualItem) rem[i]).setFixed(false);
-				
 				for (int i = 0; i < add.length; ++i) {
 					((VisualItem) add[i]).setFixed(false);
 					((VisualItem) add[i]).setFixed(true);
-				}
-				
+				}				
 				if (ts.getTupleCount() == 0) {
 					ts.addTuple(rem[0]);
 					((VisualItem) rem[0]).setFixed(false);
-				}
-				
+				}				
 				m_vis.run("draw");
 			}
 		});
@@ -141,12 +138,17 @@ public class graphAlpha extends JPanel {
 		final GraphDistanceFilter filter = new GraphDistanceFilter(graph, hops);
 
 		// color set for default node
-		int[] palette = new int[] { ColorLib.rgba(255, 200, 200, 250),
+		int[] palette = new int[] { 
+				ColorLib.rgba(255, 200, 200, 250),
 				ColorLib.rgba(200, 255, 200, 250),
-				ColorLib.rgba(200, 200, 255, 250) };
+				ColorLib.rgba(200, 200, 255, 250) 
+				};
 		// color set for highlighted node
-		int[] palette2 = new int[] { ColorLib.rgba(255, 20, 147, 200),
-				ColorLib.rgba(0, 128, 0, 200), ColorLib.rgba(0, 0, 128, 200) };
+		int[] palette2 = new int[] { 
+				ColorLib.rgba(255, 20, 147, 200),
+				ColorLib.rgba(0, 128, 0, 200),
+				ColorLib.rgba(0, 0, 128, 200) 
+				};
 
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
@@ -209,7 +211,6 @@ public class graphAlpha extends JPanel {
 		color.add(text);
 		color.add(edge);
 		color.add(edge1);
-		//color.add(edge2);
 		color.add(nStroke);
 		color.add(new RepaintAction());
 

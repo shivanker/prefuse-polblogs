@@ -1,8 +1,32 @@
-1. Edge Render //Abhishek
+1. Edge Render //Abhishek			(DONE)
 2. MinCut //Shivanker 			  (CUT)
 3. Clustering Coefficient //Akhil (DONE)
-4. SCC		//Shivanker
+4. SCC		//Shivanker				(POST)
 5. Polblogs colors fix //Abhishek (DONE)
-6. Report	//Abhishek
+6. Report	//Abhishek 				(POST)
 7. Default Full Screen //Abhishek (DONE)
-8. Directed Analysis //Akhil
+8. Undirected Analysis //Akhil    (DONE)	
+
+NEW TASKS ASSIGNED
+1. {Shivanker} // Still Working on SCC
+2. {Akhil} // Directed Analysis
+3. {Abhishek} //CSV to graphs
+4. {Abhishek} //Report
+5. {Akhil} //Node degree
+6. {Shivanker} //Graph Diameter
+7. {Abhishek} //Node degree graphs
+8. {} //
+
+//Visualization Proposals
+1. Top Bar
+2. OutGoing Arrow & InComing Arrows Different color
+3. Radios to Show only one type of Node
+4. Big Size on Hover
+5. Better color Codes
+6. Radio To Stop Moving
+7. Search bar search in values and source as well
+8. BackGround Image(Gradient Types)
+9. Seeds in Random Graphs
+10.
+
+
