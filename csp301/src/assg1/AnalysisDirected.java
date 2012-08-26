@@ -56,7 +56,7 @@ public class AnalysisDirected {
 				s.pop();
 		}
 		
-		Graph sccG = new Graph(false);
+		Graph sccG = new Graph(true);
 		sccG.addColumn("subGraph", Graph.class);
 		sccG.addColumn("0", int.class);
 		sccG.addColumn("1", int.class);
@@ -154,9 +154,38 @@ public class AnalysisDirected {
 				sccG.addEdge(leaderMap[a], leaderMap[b]);
 		}
 		
+		Graph sg2 = new Graph(true);
+		sg2.addColumn("subGraph", Graph.class);
+		sg2.addColumn("0", int.class);
+		sg2.addColumn("1", int.class);
+		sg2.addColumn("size", int.class);
+		sg2.addColumn("label", String.class);
+		sg2.addColumn("id", int.class);
+		Iterator<Node> in = sccG.nodes();
+		int i = 0;
+		while(in.hasNext())	{
+			Node t = in.next();
+			if(!t.edges().hasNext())
+				sccG.removeNode(t);
+			else	{
+				Node u = sg2.addNode();
+				u.set("subGraph", t.get("subGraph"));
+				u.set("0", t.get("0"));
+				u.set("1", t.get("1"));
+				u.set("size", t.get("size"));
+				u.set("label", t.get("label"));
+				u.set("id", i);
+				t.set("id",i++);
+			}
+		}
 		
+		Iterator<Edge> ed = sccG.edges();
+		while(ed.hasNext())	{
+			Edge a = ed.next();
+			sg2.addEdge(a.getSourceNode().getInt("id"), a.getTargetNode().getInt("id"));
+		}
 		
-		return sccG;
+		return sg2;
 	}
 
 	public static void DFS(Node n, int src) {

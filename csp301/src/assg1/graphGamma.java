@@ -206,7 +206,7 @@ public class graphGamma extends JPanel {
 		draw.add(new RepaintAction());
 
 		ForceSimulator fsim = new ForceSimulator();
-		//fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
+		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
 		fsim.addForce(new SpringForce());
 		fsim.addForce(new DragForce(0.015f));
 
@@ -220,7 +220,7 @@ public class graphGamma extends JPanel {
 		color.add(nStroke);
 		color.add(new RepaintAction());
 
-		ActionList animate = new ActionList(30000);
+		ActionList animate = new ActionList(Activity.INFINITY);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(new RepaintAction());
 
@@ -228,7 +228,7 @@ public class graphGamma extends JPanel {
 		// we can later execute our Actions by invoking a method on our
 		// Visualization, using the name we've chosen below.
 		m_vis.putAction("draw", draw);
-		//m_vis.putAction("layout", animate);
+		m_vis.putAction("layout", animate);
 		m_vis.runAfter("draw", "layout");
 		m_vis.putAction("layout", color);
 
@@ -495,9 +495,9 @@ public class graphGamma extends JPanel {
 				y = 0;
 			double width = getBaseSize() * item.getSize();
 			
-//			if(item instanceof NodeItem)	{
-//				width += item.getInt("size");
-//			}
+			if(item instanceof NodeItem)	{
+				width += item.getInt("size")*0.2;
+			}
 
 			// Center the shape around the specified x and y
 			if (width > 1) {
