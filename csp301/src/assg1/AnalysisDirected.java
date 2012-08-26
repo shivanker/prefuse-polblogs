@@ -1,12 +1,12 @@
 package assg1;
 
-import java.awt.GraphicsEnvironment;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
-
-import javax.swing.JFrame;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
@@ -14,7 +14,6 @@ import prefuse.data.Node;
 import prefuse.data.Table;
 import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
-import prefuse.util.ui.UILib;
 
 public class AnalysisDirected {
 	static Stack<Node> s = new Stack<Node>();
@@ -285,7 +284,7 @@ public class AnalysisDirected {
 		return sameEdge;
 	}
 
-	public static void main(String... args) throws DataIOException {
+	public static void main(String... args) throws DataIOException, IOException {
 		Graph f = new GraphMLReader().readGraph("polblogs.xml");
 		f.addColumn("id", int.class);
 		Iterator<Node> n = f.nodes();
@@ -293,11 +292,10 @@ public class AnalysisDirected {
 		while (n.hasNext()) {
 			n.next().set("id", i++);
 		}
-
-
+		BufferedWriter bw = new BufferedWriter(new FileWriter("polblogsAnalysis.csv"));
 		tuple t = countTriangles(f);
-		System.out.println("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
-		System.out.println("polblogs.xml,"+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+		bw.write("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
+		bw.write("polblogs.xml,"+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
 		for (int j=1; j<=50; j++)
 		{
 			String filename = "polblogs_rand_"+j+".xml";
@@ -310,7 +308,7 @@ public class AnalysisDirected {
 
 			}
 			t = countTriangles(f);
-			System.out.println(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+			bw.write(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
 		}
 //		Graph g = (Graph) setSCC(polbooks);
 //		int c = 0;
@@ -327,5 +325,6 @@ public class AnalysisDirected {
 //		JFrame frame = GraphView.demo(g,"id");
 //
 //		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		bw.close();
 	}
 }

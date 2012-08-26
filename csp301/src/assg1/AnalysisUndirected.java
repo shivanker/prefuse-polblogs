@@ -1,5 +1,7 @@
 package assg1;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -105,6 +107,7 @@ public class AnalysisUndirected {
 
 	public static void main(String... args) throws DataIOException, IOException	{
 		Graph g = new GraphMLReader().readGraph("polbooks.xml");
+		BufferedWriter bw = new BufferedWriter(new FileWriter("polbooksAnalysis.csv"));
 		g.addColumn("id", int.class);
 		Iterator<Node> n = g.nodes();
 		int i = 0;
@@ -112,8 +115,8 @@ public class AnalysisUndirected {
 			n.next().set("id", i++);
 		}
 		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
-		System.out.println("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
-		System.out.println("polbooks.xml,"+(((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+		bw.write("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
+		bw.write("polbooks.xml,"+(((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount())+","+t.Pearson+","+t.Spearman);
 		for (int j=1; j<=50; j++)
 		{
 			String filename = "polbooks_rand_"+j+".xml";
@@ -125,8 +128,9 @@ public class AnalysisUndirected {
 				n.next().set("id", i++);
 			}
 			t = countTrianglesAndNetworkClusteringCoefficient(g);
-			System.out.println((filename+","+((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+			bw.write((filename+","+((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount())+","+t.Pearson+","+t.Spearman);
 		}
+		bw.close();
 	}
 	static long nC3(int n)
 	{
