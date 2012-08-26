@@ -12,7 +12,7 @@ public class random_g {
 
 	public static void main(String[] args) throws IOException {
 		// intialise
-		String file_name = "polbooks.xml";
+		String file_name = "polblogs.xml";
 		int no_of_file = 50;
 		if(args.length>1){
 			file_name = args[0];
@@ -39,16 +39,18 @@ public class random_g {
 		long tim = System.currentTimeMillis();
 		String tokens[] = file_str.split(" ");
 		tim = (System.currentTimeMillis() - tim);
-		System.out.println("Time taken to token the File: " + file_name + " "+ tim + " millisec\n\n");
+		System.out.println("Time taken to tokenize the File: " + file_name + " "+ tim + " millisec\n\n");
 		
 
 		// Write File
 		new File(fb).mkdir();
+		Random rgen = new Random();
 		
 		for (int k = 1; k <= no_of_file; k++) {
 			System.out.print("File "+k+":  Writing");
 			File file = new File(fb+"\\"+fb+k+ex);
-			Random rand = new Random();
+			Random rand = new Random(System.nanoTime()*rgen.nextLong());
+			
 			int no_of_nodes = 0;
 			for (int j = 0; j < tokens.length; j++) {
 				if (tokens[j].contains("<node"))
@@ -59,8 +61,6 @@ public class random_g {
 			int trg = 0;
 			HashSet s1 = new HashSet();
 			HashSet h = new HashSet();
-			s1.clear();
-			h.clear();
 			for (int i = 0; i < tokens.length; i++) {
 				if (tokens[i].contains("source=\"")) {
 					src = rand.nextInt(no_of_nodes);
@@ -77,7 +77,7 @@ public class random_g {
 								continue;
 							} else {
 								h.add(s1);
-								s1.clear();
+								s1 = new HashSet();
 								break;
 							}
 						}
