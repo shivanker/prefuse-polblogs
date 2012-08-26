@@ -23,6 +23,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -39,6 +40,7 @@ import prefuse.action.assignment.DataColorAction;
 import prefuse.action.filter.GraphDistanceFilter;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
+import prefuse.controls.Control;
 import prefuse.controls.ControlAdapter;
 import prefuse.controls.DragControl;
 import prefuse.controls.FocusControl;
@@ -77,7 +79,7 @@ import prefuse.visual.NodeItem;
 import prefuse.visual.VisualGraph;
 import prefuse.visual.VisualItem;
 
-public class graphAlpha extends JPanel {
+public class graphGamma extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final String graph = "graph";
@@ -86,7 +88,7 @@ public class graphAlpha extends JPanel {
 
 	private Visualization m_vis;
 
-	public graphAlpha(Graph g, String label) {
+	public graphGamma(Graph g, String label) {
 		super(new BorderLayout());
 
 		// create a new, empty visualization for our data
@@ -97,15 +99,14 @@ public class graphAlpha extends JPanel {
 		// ShapeRenderer sr = new ShapeRenderer();
 		// LabelRenderer tr = new LabelRenderer();
 		// tr.setRoundedCorner(20, 20);
-		
-		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,Constants.EDGE_ARROW_REVERSE);
+
+		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,
+				Constants.EDGE_ARROW_REVERSE);
 		nodeRenderer nr = new nodeRenderer();
-		m_vis.setRendererFactory(new DefaultRendererFactory(nr,er));
-		
+		m_vis.setRendererFactory(new DefaultRendererFactory(nr, er));
+
 		er.setArrowHeadSize(5, 5);
 		er.setDefaultLineWidth(0.5);
-		
-		
 
 		// --------------------------------------------------------------------
 		// register the data with a visualization
@@ -114,22 +115,22 @@ public class graphAlpha extends JPanel {
 
 		// fix selected focus nodes
 		TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS);
-		
+
 		focusGroup.addTupleSetListener(new TupleSetListener() {
 			public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
 				for (int i = 0; i < rem.length; ++i)
 					((VisualItem) rem[i]).setFixed(false);
-				
+
 				for (int i = 0; i < add.length; ++i) {
 					((VisualItem) add[i]).setFixed(false);
 					((VisualItem) add[i]).setFixed(true);
 				}
-				
+
 				if (ts.getTupleCount() == 0) {
 					ts.addTuple(rem[0]);
 					((VisualItem) rem[0]).setFixed(false);
 				}
-				
+
 				m_vis.run("draw");
 			}
 		});
@@ -148,14 +149,17 @@ public class graphAlpha extends JPanel {
 				ColorLib.rgba(0, 128, 0, 200), ColorLib.rgba(0, 0, 128, 200) };
 
 		// map nominal data values to colors using our provided palette
-		DataColorAction fill = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		DataColorAction fill2 = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
+		DataColorAction fill = new DataColorAction(nodes, "value",
+				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+		DataColorAction fill2 = new DataColorAction(nodes, "value",
+				Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
 		fill.add(VisualItem.FIXED, ColorLib.rgba(0, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, fill2);
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
 
 		// use white for node text
-		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,ColorLib.gray(0));
+		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,
+				ColorLib.gray(0));
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
 
 		// outlines of nodes
@@ -166,15 +170,19 @@ public class graphAlpha extends JPanel {
 		nStroke.add("ingroup('_search')", ColorLib.gray(10));
 
 		// use light grey for edges
-		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(200));
+		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,
+				ColorLib.gray(200));
 		// use dark light grey for edges
-		ColorAction edge1 = new ColorAction(edges, VisualItem.FILLCOLOR,ColorLib.gray(150));
-		
-		ColorAction edge2 = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(50));
-		ColorAction edge3 = new ColorAction(edges, VisualItem.FILLCOLOR,ColorLib.gray(50));
-		edge.add(VisualItem.HIGHLIGHT,edge2);
+		ColorAction edge1 = new ColorAction(edges, VisualItem.FILLCOLOR,
+				ColorLib.gray(150));
+
+		ColorAction edge2 = new ColorAction(edges, VisualItem.STROKECOLOR,
+				ColorLib.gray(50));
+		ColorAction edge3 = new ColorAction(edges, VisualItem.FILLCOLOR,
+				ColorLib.gray(50));
+		edge.add(VisualItem.HIGHLIGHT, edge2);
 		edge1.add(VisualItem.HIGHLIGHT, edge3);
-		
+
 		// animate paint change
 		ActionList animatePaint = new ActionList(1000);
 		animatePaint.add(new ColorAnimator(nodes));
@@ -208,15 +216,14 @@ public class graphAlpha extends JPanel {
 		color.add(text);
 		color.add(edge);
 		color.add(edge1);
-		//color.add(edge2);
+		// color.add(edge2);
 		color.add(nStroke);
 		color.add(new RepaintAction());
 
 		ActionList animate = new ActionList(30000);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(new RepaintAction());
-		
-		
+
 		// finally, we register our ActionList with the Visualization.
 		// we can later execute our Actions by invoking a method on our
 		// Visualization, using the name we've chosen below.
@@ -224,20 +231,19 @@ public class graphAlpha extends JPanel {
 		m_vis.putAction("layout", animate);
 		m_vis.runAfter("draw", "layout");
 		m_vis.putAction("layout", color);
-		
-		Image img=null;
-		try{
+
+		Image img = null;
+		try {
 			img = ImageIO.read(new File("test1.jpg"));
-		}
-		catch(IOException e){
-			System.err.println("Background Image File Not Found");
+		} catch (IOException e) {
+			System.out.println("Background Image File Not Found");
 		}
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
 		Display display = new Display(m_vis);
 		display.setSize(1000, 700);
 		display.pan(500, 350);
-		//display.setBackgroundImage(img, true, true);
+		// display.setBackgroundImage(img, true, true);
 		display.zoom(new Point2D.Float(500, 350), 1.5);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
@@ -322,8 +328,10 @@ public class graphAlpha extends JPanel {
 					String label = item.getString("label");
 					String aff = "" + item.get("value");
 					String source = "" + item.get("source");
-					if (aff.equals("1"))
+					if (aff.equals("0"))
 						aff = "Conservative";
+					else if (aff.equals("1"))
+						aff = "Neutral";
 					else
 						aff = "Liberal";
 					title.setText(label);
@@ -389,7 +397,7 @@ public class graphAlpha extends JPanel {
 	public static void main(String[] args) {
 		UILib.setPlatformLookAndFeel();
 
-		// create graphAlpha
+		// create graphGamma
 		String datafile = "polblogs.xml";
 		String label = "label";
 		if (args.length > 1) {
@@ -416,7 +424,7 @@ public class graphAlpha extends JPanel {
 		Graph g = null;
 		try {
 			g = new GraphMLReader().readGraph(datafile);
-			// System.out.print(g.isDirected());
+			System.out.print(g.isDirected());
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -436,7 +444,7 @@ public class graphAlpha extends JPanel {
 			}
 		}
 
-		final graphAlpha view = new graphAlpha(g, label);
+		final graphGamma view = new graphGamma(g, label);
 
 		// launch window
 		JFrame frame = new JFrame(
@@ -490,6 +498,10 @@ public class graphAlpha extends JPanel {
 			if (Double.isNaN(y) || Double.isInfinite(y))
 				y = 0;
 			double width = getBaseSize() * item.getSize();
+			
+			if(item instanceof NodeItem)	{
+				width += item.getInt("size");
+			}
 
 			// Center the shape around the specified x and y
 			if (width > 1) {
@@ -533,6 +545,18 @@ public class graphAlpha extends JPanel {
 			// default:
 			// throw new IllegalStateException("Unknown shape type: "+stype);
 			// }
+		}
+
+	}
+
+	class sccOpener extends ControlAdapter implements Control {
+
+		public void itemClicked(VisualItem item, MouseEvent e) {
+			if (item instanceof NodeItem) {
+				
+				JFrame frame = graphAlpha.demo((Graph)item.get("subGraph"), "label");
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			}
 		}
 
 	}

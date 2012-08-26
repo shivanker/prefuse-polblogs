@@ -117,8 +117,10 @@ public class AnalysisDirected {
 						sgs[i].addEdge(j, k);
 			}
 
+		int leaderMap[] = new int[g.getNodeCount()], l = 0;
 		for (int i = 0; i < g.getNodeCount(); ++i)
 			if (sgs[i] != null) {
+				leaderMap[i] = l++;
 				Node sn = sccG.addNode();
 				sn.set("subGraph", sgs[i]);
 				// System.out.println(i+": "+sgs[i].getNodeCount());
@@ -135,6 +137,15 @@ public class AnalysisDirected {
 					else
 						sn.set("l", (int) sn.get("l") + 1);
 			}
+		
+		Iterator<Edge> ie = g.edges();
+		while(ie.hasNext())	{
+			Edge t = ie.next();
+			int a = g.getNode(t.getInt("source")).getInt("leader"), b = g.getNode(t.getInt("target")).getInt("leader");
+			if(a != b)
+				sccG.addEdge(leaderMap[a], leaderMap[b]);
+		}
+		
 		return sccG;
 	}
 
@@ -223,23 +234,23 @@ public class AnalysisDirected {
 			n.next().set("id", i++);
 		}
 		Graph g = (Graph) setSCC(polbooks);
-		int c = 0;
-		for (i = 0; i < g.getNodeCount(); ++i)
-			if (g.getNode(i).getInt("size") > 1) {
-				// g = (Graph) g.getNode(i).get("subGraph");
-				// System.out.println(g.getNode(i).getInt("size"));
-				c++;
-				if (g.getNode(i).getInt("size") > 1) {
-					g = (Graph) g.getNode(i).get("subGraph");
-					break;
-				}
-			}
-		System.out.println(g.getNodeCount() + " " + c + " " + triangleBrute(g));
+//		int c = 0;
+//		for (i = 0; i < g.getNodeCount(); ++i)
+//			if (g.getNode(i).getInt("size") > 1) {
+//				// g = (Graph) g.getNode(i).get("subGraph");
+//				// System.out.println(g.getNode(i).getInt("size"));
+//				c++;
+//				if (g.getNode(i).getInt("size") > 1) {
+//					g = (Graph) g.getNode(i).get("subGraph");
+//					break;
+//				}
+//			}
+//		System.out.println(g.getNodeCount() + " " + c + " " + triangleBrute(g));
 
 		UILib.setPlatformLookAndFeel();
 		GraphicsEnvironment e = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
-		JFrame frame = graphAlpha.demo(polbooks, "label");
+		JFrame frame = graphGamma.demo(g, "label");
 
 		frame.setMaximizedBounds(e.getMaximumWindowBounds());
 		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
