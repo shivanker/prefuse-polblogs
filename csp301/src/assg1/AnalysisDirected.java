@@ -213,10 +213,12 @@ public class AnalysisDirected {
 		s.push(n);
 	}
 
-	public static int countTriangles(Graph g) {
-		int c = 0;
+	public static tuple countTriangles(Graph g) {
+		tuple c = new tuple(0,0.0);
+		g.addColumn("Triangles", int.class, 0);
+		g.addColumn("localClusteringCoefficient", double.class, 0);
 		g.addColumn("close", HashSet.class, null);
-		for (int i = 0; i < g.getNodeCount(); ++i)
+		for(int i=0; i<g.getNodeCount(); ++i)
 			g.getNode(i).set("close", new HashSet<Node>());
 		Iterator<Node> nodes = g.nodes();
 		while (nodes.hasNext()) {
@@ -225,14 +227,40 @@ public class AnalysisDirected {
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
 				if (t.getInt("id") > s.getInt("id")) {
-					Set<Node> intersection = new HashSet(
-							(HashSet<Node>) s.get("close"));
+					Set<Node> intersection = new HashSet((HashSet<Node>) s.get("close"));
 					intersection.retainAll((HashSet<Node>) t.get("close"));
-					c += intersection.size();
+					int n = intersection.size();
+					c.Triangles += n;
+					s.setInt("Triangles", s.getInt("Triangles")+n);
+					t.setInt("Triangles", t.getInt("Triangles")+n);
+					Iterator<Node> i = intersection.iterator();
+					while (i.hasNext())
+					{
+						Node temp = i.next();
+						temp.setInt("Triangles", temp.getInt("Triangles")+1);
+					}
 					((HashSet<Node>) t.get("close")).add(s);
 				}
 			}
 		}
+		Iterator<Node> node = g.nodes();
+		while (node.hasNext())
+		{
+			Node temp = node.next();
+			int n = temp.getDegree();
+			int d = 0;
+			Iterator<Node> I = temp.outNeighbors();
+			while (I.hasNext())
+			{
+				Node t = I.next();
+				if (g.getEdge(t,temp)!=null)
+					d++;
+			}
+			int denominator = (n*(n-1)) - 2*d;
+			temp.setDouble("localClusteringCoefficient", (denominator>0)?(temp.getInt("Triangles"))/(double)denominator:0);
+			c.Clustering += temp.getDouble("localClusteringCoefficient");
+		}
+		c.Clustering /= (double)(g.getNodeCount());
 		return c;
 	}
 
