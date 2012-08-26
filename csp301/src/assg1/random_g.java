@@ -12,7 +12,7 @@ public class random_g {
 
 	public static void main(String[] args) throws IOException {
 		// intialise
-		String file_name = "polblogs.xml";
+		String file_name = "polbooks.xml";
 		int no_of_file = 50;
 		if(args.length>1){
 			file_name = args[0];
@@ -63,12 +63,12 @@ public class random_g {
 			HashSet h = new HashSet();
 			for (int i = 0; i < tokens.length; i++) {
 				if (tokens[i].contains("source=\"")) {
-					src = rand.nextInt(no_of_nodes+1)+1;
+					src = rand.nextInt(no_of_nodes);
 					output.write("source=\"" + src + "\" ");
 					s1.add(src);
 				} else if (tokens[i].contains("target=\"")) {
 					while (true) {
-						trg = rand.nextInt(no_of_nodes+1)+1;
+						trg = rand.nextInt(no_of_nodes);
 						if (src == trg)
 							continue;
 						else {
