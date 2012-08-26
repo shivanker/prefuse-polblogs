@@ -143,10 +143,13 @@ public class graphGamma extends JPanel {
 		// color set for default node
 		int[] palette = new int[] { ColorLib.rgba(255, 200, 200, 250),
 				ColorLib.rgba(200, 255, 200, 250),
+				ColorLib.rgba(255, 200, 125, 250),
 				ColorLib.rgba(200, 200, 255, 250) };
 		// color set for highlighted node
 		int[] palette2 = new int[] { ColorLib.rgba(255, 20, 147, 200),
-				ColorLib.rgba(0, 128, 0, 200), ColorLib.rgba(0, 0, 128, 200) };
+				ColorLib.rgba(0, 128, 0, 200),
+				ColorLib.rgba(225, 150, 100, 200),
+				ColorLib.rgba(0, 0, 128, 200) };
 
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction(nodes, "size",
@@ -259,10 +262,10 @@ public class graphGamma extends JPanel {
 		display.addControlListener(new ToolTipControl(new String[] { "size" }));
 		display.addControlListener(new sccOpener());
 
-//		// overview display
-//		Display overview = new Display(m_vis);
-//		overview.setSize(290, 290);
-//		overview.addItemBoundsListener(new FitOverviewListener());
+		// // overview display
+		// Display overview = new Display(m_vis);
+		// overview.setSize(290, 290);
+		// overview.addItemBoundsListener(new FitOverviewListener());
 
 		// --------------------------------------------------------------------
 		// launch the visualization
@@ -326,7 +329,8 @@ public class graphGamma extends JPanel {
 		display.addControlListener(new ControlAdapter() {
 			public void itemEntered(VisualItem item, MouseEvent e) {
 				if (item instanceof NodeItem) {
-					int size = item.getInt("size"), l = item.getInt("0"), c = item.getInt("1");
+					int size = item.getInt("size"), l = item.getInt("0"), c = item
+							.getInt("1");
 					title.setText("Size of SCC: " + size);
 					value.setText("No. of liberals: " + l);
 					value2.setText("No. of conservatives: " + c);
@@ -398,8 +402,9 @@ public class graphGamma extends JPanel {
 				.getLocalGraphicsEnvironment();
 		JFrame frame = demo(datafile);
 
-		//frame.setMaximizedBounds(e.getMaximumWindowBounds());
-		//frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		// frame.setMaximizedBounds(e.getMaximumWindowBounds());
+		// frame.setExtendedState(frame.getExtendedState() |
+		// JFrame.MAXIMIZED_BOTH);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -415,7 +420,7 @@ public class graphGamma extends JPanel {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
+
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
 			Iterator<Node> n = g.nodes();
@@ -424,12 +429,12 @@ public class graphGamma extends JPanel {
 				n.next().set("id", i++);
 			}
 		}
-		
+
 		return demo(g);
 	}
 
 	public static JFrame demo(Graph g) {
-		
+
 		g = AnalysisDirected.setSCC(g);
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
@@ -439,8 +444,8 @@ public class graphGamma extends JPanel {
 				n.next().set("id", i++);
 			}
 		}
-		
-		final graphGamma view = new graphGamma(g);		
+
+		final graphGamma view = new graphGamma(g);
 
 		// launch window
 		JFrame frame = new JFrame(
@@ -462,26 +467,26 @@ public class graphGamma extends JPanel {
 		return frame;
 	}
 
-//	public static class FitOverviewListener implements ItemBoundsListener {
-//		private Rectangle2D m_bounds = new Rectangle2D.Double();
-//		private Rectangle2D m_temp = new Rectangle2D.Double();
-//		private double m_d = 15;
-//
-//		public void itemBoundsChanged(Display d) {
-//			d.getItemBounds(m_temp);
-//			GraphicsLib.expand(m_temp, 25 / d.getScale());
-//
-//			double dd = m_d / d.getScale();
-//			double xd = Math.abs(m_temp.getMinX() - m_bounds.getMinX());
-//			double yd = Math.abs(m_temp.getMinY() - m_bounds.getMinY());
-//			double wd = Math.abs(m_temp.getWidth() - m_bounds.getWidth());
-//			double hd = Math.abs(m_temp.getHeight() - m_bounds.getHeight());
-//			if (xd > dd || yd > dd || wd > dd || hd > dd) {
-//				m_bounds.setFrame(m_temp);
-//				DisplayLib.fitViewToBounds(d, m_bounds, 0);
-//			}
-//		}
-//	}
+	// public static class FitOverviewListener implements ItemBoundsListener {
+	// private Rectangle2D m_bounds = new Rectangle2D.Double();
+	// private Rectangle2D m_temp = new Rectangle2D.Double();
+	// private double m_d = 15;
+	//
+	// public void itemBoundsChanged(Display d) {
+	// d.getItemBounds(m_temp);
+	// GraphicsLib.expand(m_temp, 25 / d.getScale());
+	//
+	// double dd = m_d / d.getScale();
+	// double xd = Math.abs(m_temp.getMinX() - m_bounds.getMinX());
+	// double yd = Math.abs(m_temp.getMinY() - m_bounds.getMinY());
+	// double wd = Math.abs(m_temp.getWidth() - m_bounds.getWidth());
+	// double hd = Math.abs(m_temp.getHeight() - m_bounds.getHeight());
+	// if (xd > dd || yd > dd || wd > dd || hd > dd) {
+	// m_bounds.setFrame(m_temp);
+	// DisplayLib.fitViewToBounds(d, m_bounds, 0);
+	// }
+	// }
+	// }
 
 	class nodeRenderer extends ShapeRenderer {
 
@@ -494,9 +499,9 @@ public class graphGamma extends JPanel {
 			if (Double.isNaN(y) || Double.isInfinite(y))
 				y = 0;
 			double width = getBaseSize() * item.getSize();
-			
-			if(item instanceof NodeItem)	{
-				width += item.getInt("size")*0.25;
+
+			if (item instanceof NodeItem) {
+				width += item.getInt("size") * 0.25;
 			}
 
 			// Center the shape around the specified x and y
@@ -541,9 +546,35 @@ public class graphGamma extends JPanel {
 
 		public void itemClicked(VisualItem item, MouseEvent e) {
 			if (item instanceof NodeItem)
-				graphAlpha.demo((Graph)item.get("subGraph"), "label");
+				graphAlpha.demo((Graph) item.get("subGraph"), "label");
 		}
 
+	}
+
+	class modToolTip extends ToolTipControl {
+		public modToolTip(String[] f) {
+			super(f);
+		}
+
+		@Override
+		public void itemEntered(VisualItem item, MouseEvent e) {
+			Display d = (Display)e.getSource();
+	        if ( label.length == 1 ) {
+	            // optimize the simple case
+	            if ( item.canGetString(label[0]) )
+	                d.setToolTipText(item.getString(label[0]));
+	        } else {
+	            sbuf.delete(0, sbuf.length());
+	            for ( int i=0; i<label.length; ++i ) {
+	                if ( item.canGetString(label[i]) ) {
+	                    if ( sbuf.length() > 0 )
+	                        sbuf.append("; ");
+	                    sbuf.append(item.getString(label[i]));
+	                }
+	            }
+	            d.setToolTipText(sbuf.toString());
+	        }
+		}
 	}
 
 }

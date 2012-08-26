@@ -165,7 +165,8 @@ public class AnalysisDirected {
 		int i = 0;
 		while(in.hasNext())	{
 			Node t = in.next();
-			
+			if (t.getInt("size") > 2)
+				System.out.println(t.getInt("size"));
 			if(!t.edges().hasNext())
 				sccG.removeNode(t);
 			else	{
@@ -310,7 +311,7 @@ public class AnalysisDirected {
 				// g = (Graph) g.getNode(i).get("subGraph");
 				// System.out.println(g.getNode(i).getInt("size"));
 				c++;
-				System.out.println(((Graph)g.getNode(i).get("subGraph")).getNodeCount());
+		//		System.out.println(((Graph)g.getNode(i).get("subGraph")).getNodeCount());
 			}
 		System.out.println(g.getNodeCount() + " " + c + " " + triangleBrute(g));
 
