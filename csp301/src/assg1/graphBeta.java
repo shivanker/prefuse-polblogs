@@ -217,7 +217,7 @@ public class graphBeta extends JPanel {
 		
 		Image img=null;
 		try{
-			img = ImageIO.read(new File("test1.jpg"));
+			img = ImageIO.read(new File("test.jpg"));
 		}
 		catch(IOException e){
 			System.out.println("Background Image File Not Found");
