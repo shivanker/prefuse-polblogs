@@ -8,7 +8,7 @@
 8. Undirected Analysis //Akhil    (DONE)	
 
 NEW TASKS ASSIGNED
-1. {Shivanker} // Still Working on SCC
+1. {Shivanker} (DONE)
 2. {Akhil} // Directed Analysis
 3. {Abhishek} //CSV to graphs
 4. {Abhishek} //Report

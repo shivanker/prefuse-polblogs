@@ -35,7 +35,7 @@ public class Statistics
 			sum+=X[i];
 		return (sum/X.length);
 	}
-	private double median(double[] array, int left, int right)
+	public static int median(int[] array, int left, int right)
 	{
 		int k = array.length/2;
 		while(true)
@@ -58,7 +58,7 @@ public class Statistics
 					swap( array, left, left + 1 );
 				int i = left + 1;
 				int j = right;
-				double pivot = array[ left + 1 ];
+				int pivot = array[ left + 1 ];
 				while( true )
 				{ 
 					do
@@ -80,9 +80,9 @@ public class Statistics
 			}
 		}
 	}
-	private void swap( double[] array, int a, int b )
+	public static void swap( int[] array, int a, int b )
 	{
-		double temp = array[ a ];
+		int temp = array[ a ];
 		array[ a ] = array[ b ];
 		array[ b ] = temp;
 	}
