@@ -2,14 +2,14 @@ package assg1;
 
 public class Statistics
 {
-	public static double covariance(double[] X, double[] Y)
+	public double covariance(int[] X, int[] Y)
 	{
-		double XY[] = new double[X.length];
+		int XY[] = new int[X.length];
 		for (int i=0; i<XY.length; i++)
 			XY[i] = X[i] * Y[i];
 		return (mean(XY) - mean(X)*mean(Y));
 	}
-	public static double SpearmanStatistic(double[] X, double[] Y)
+	public double SpearmanStatistic(int[] X, int[] Y)
 	{
 		double xmean = mean(X);
 		double ymean = mean(Y);
@@ -24,18 +24,18 @@ public class Statistics
 		}
 		return (num/Math.sqrt(den1*den2));
 	}
-	public static double PearsonStatistic(double[] X, double[] Y)
+	public double PearsonStatistic(int[] X, int[] Y)
 	{
 		return (covariance(X,Y)/Math.sqrt(covariance(X,X)*covariance(Y,Y)));
 	}
-	public static double mean(double[] X)
+	public static double mean(int[] X)
 	{
 		double sum = 0;
 		for (int i=0; i<X.length; i++)
 			sum+=X[i];
 		return (sum/X.length);
 	}
-	private static double median(double[] array, int left, int right)
+	private double median(double[] array, int left, int right)
 	{
 		int k = array.length/2;
 		while(true)
@@ -80,7 +80,7 @@ public class Statistics
 			}
 		}
 	}
-	private static void swap( double[] array, int a, int b )
+	private void swap( double[] array, int a, int b )
 	{
 		double temp = array[ a ];
 		array[ a ] = array[ b ];

@@ -44,6 +44,7 @@ public class AnalysisUndirected {
 	}
 	
 	public static tuple countTrianglesAndNetworkClusteringCoefficient(Graph g) {
+		Statistics st = new Statistics();
 		tuple c = new tuple(0,0.0);
 		g.addColumn("Triangles", int.class, 0);
 		g.addColumn("localClusteringCoefficient", double.class, 0);
@@ -74,14 +75,21 @@ public class AnalysisUndirected {
 			}
 		}
 		Iterator<Node> node = g.nodes();
+		int [] Triangles = new int[g.getNodeCount()];
+		int [] Degrees = new int[g.getNodeCount()];
+		int i = 0;
 		while (node.hasNext())
 		{
 			Node temp = node.next();
 			int n = temp.getDegree();
 			temp.setDouble("localClusteringCoefficient", (n>1)?(2*temp.getInt("Triangles"))/((double)n*(n-1)):0);
 			c.Clustering += temp.getDouble("localClusteringCoefficient");
+			Triangles[i] = temp.getInt("Triangles");
+			Degrees[i] = temp.getDegree();
 		}
 		c.Clustering /= (double)(g.getNodeCount());
+		c.Pearson = st.PearsonStatistic(Triangles, Degrees);
+		c.Spearman = st.SpearmanStatistic(Triangles, Degrees);
 		return c;
 	}
 	public static int classifyEdges(Graph g) {
@@ -104,8 +112,8 @@ public class AnalysisUndirected {
 			n.next().set("id", i++);
 		}
 		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
-		System.out.println("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\"");
-		System.out.println("polbooks.xml,"+(((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
+		System.out.println("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
+		System.out.println("polbooks.xml,"+(((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount())+","+t.Pearson+","+t.Spearman);
 		for (int j=1; j<=50; j++)
 		{
 			String filename = "polbooks_rand_"+j+".xml";
@@ -117,7 +125,7 @@ public class AnalysisUndirected {
 				n.next().set("id", i++);
 			}
 			t = countTrianglesAndNetworkClusteringCoefficient(g);
-			System.out.println((filename+","+((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount()));
+			System.out.println((filename+","+((double)t.Triangles)/nC3(g.getNodeCount()))+","+t.Clustering+","+((double)classifyEdges(g)/g.getEdgeCount())+","+t.Pearson+","+t.Spearman);
 		}
 	}
 	static long nC3(int n)
@@ -129,6 +137,8 @@ class tuple
 {
 	int Triangles;
 	double Clustering;
+	double Pearson;
+	double Spearman;
 	tuple(int a, double b)
 	{
 		Triangles = a;
