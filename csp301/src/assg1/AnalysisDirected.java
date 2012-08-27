@@ -1,6 +1,7 @@
 package assg1;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Table;
+import prefuse.data.io.CSVTableWriter;
 import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
 
@@ -21,6 +23,8 @@ public class AnalysisDirected {
 	public static Table nodalAnalysis(Graph g) {
 		Iterator<Node> nodes = g.nodes();
 		Table tb = new Table();
+		tb.addColumn("Name", String.class);
+		tb.addColumn("Affliation", String.class);
 		tb.addColumn("Conservative", int.class, 0);
 		tb.addColumn("Liberal", int.class, 0);
 		tb.addRows(g.getNodeCount());
@@ -30,13 +34,15 @@ public class AnalysisDirected {
 			int c = 0, l = 0;
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
-				if (t.get("value") == "c")
+				if (t.getInt("value") == 1)
 					c++;
 				else
 					l++;
 			}
 			tb.setInt((int) temp.get("id"), "Conservative", c);
 			tb.setInt((int) temp.get("id"), "Liberal", l);
+			tb.setString((int) temp.get("id"), "Affliation", (temp.getInt("value")==1)?"Conservative":"Liberal");
+			tb.setString((int) temp.get("id"), "Name", (String) temp.get("label"));
 		}
 		return tb;
 	}
@@ -295,7 +301,7 @@ public class AnalysisDirected {
 		while (n.hasNext()) {
 			n.next().set("id", i++);
 		}
-		BufferedWriter bw = new BufferedWriter(new FileWriter("polblogsAnalysis.csv"));
+		BufferedWriter bw = new BufferedWriter(new FileWriter("blogsGraphAnalysis.csv"));
 		tuple t = countTriangles(f);
 		bw.write("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\"");
 		bw.newLine();
@@ -332,5 +338,10 @@ public class AnalysisDirected {
 //
 //		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		bw.close();
+		FileOutputStream fos = new FileOutputStream("polblogsAnalysis.csv");
+		Table tb = nodalAnalysis(f);
+		CSVTableWriter tw = new CSVTableWriter();
+		tw.writeTable(tb, fos);
+		fos.close();
 	}
 }

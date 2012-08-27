@@ -23,11 +23,11 @@ public class AnalysisUndirected {
 	public static Table nodalAnalysis(Graph g) {
 		Iterator<Node> nodes = g.nodes();
 		Table tb = new Table();
+		tb.addColumn("Name", String.class);
+		tb.addColumn("Affliation", String.class);
 		tb.addColumn("Conservative", int.class, 0);
 		tb.addColumn("Liberal", int.class, 0);
 		tb.addColumn("Neutral", int.class, 0);
-		tb.addColumn("Affliation", String.class);
-		tb.addColumn("Name", String.class);
 		tb.addRows(g.getNodeCount());
 		while (nodes.hasNext()) {
 			Node temp = nodes.next();
