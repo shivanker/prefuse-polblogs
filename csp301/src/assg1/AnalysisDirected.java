@@ -17,6 +17,7 @@ import prefuse.data.io.CSVTableWriter;
 import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
 
+@SuppressWarnings("unchecked")
 public class AnalysisDirected {
 	static Stack<Node> s = new Stack<Node>();
 
@@ -60,7 +61,7 @@ public class AnalysisDirected {
 			else
 				s.pop();
 		}
-		
+
 		Graph sccG = new Graph(true);
 		sccG.addColumn("subGraph", Graph.class);
 		sccG.addColumn("0", int.class);
@@ -68,7 +69,7 @@ public class AnalysisDirected {
 		sccG.addColumn("size", int.class);
 		sccG.addColumn("label", String.class);
 		sccG.addColumn("id", int.class);
-		
+
 		Graph[] sgs = new Graph[g.getNodeCount()];
 		String[] sgsLabels = new String[g.getNodeCount()];
 		g.addColumn("set", boolean.class, false);
@@ -97,7 +98,9 @@ public class AnalysisDirected {
 				int c = 0, loop = 0;
 				while (true) {
 					try {
-						Iterator<Node> neitr = g.getNode(sgs[i].getNode(loop).getInt("idOld")).neighbors();
+						Iterator<Node> neitr = g.getNode(
+								sgs[i].getNode(loop).getInt("idOld"))
+								.neighbors();
 
 						while (neitr.hasNext()) {
 							Node n = neitr.next();
@@ -112,7 +115,8 @@ public class AnalysisDirected {
 							temp.set("leader", n.getInt("leader"));
 							temp.set("label", n.getString("label"));
 							temp.set("source", n.getString("source"));
-							sgsLabels[i] = new String(sgsLabels[i] + n.getString("label"));
+							sgsLabels[i] = new String(sgsLabels[i]
+									+ n.getString("label"));
 							n.set("set", true);
 						}
 
@@ -144,21 +148,21 @@ public class AnalysisDirected {
 					else
 						sn.set("1", (int) sn.get("1") + 1);
 			}
-		
 
 		HashSet<Integer> leaders = new HashSet<Integer>();
-		for(int i=0; i<g.getNodeCount(); ++i)
+		for (int i = 0; i < g.getNodeCount(); ++i)
 			leaders.add(g.getNode(i).getInt("leader"));
-		System.out.println(leaders+"\n"+g.getEdgeCount() + "\n");
-		
+		System.out.println(leaders + "\n" + g.getEdgeCount() + "\n");
+
 		Iterator<Edge> ie = g.edges();
-		while(ie.hasNext())	{
+		while (ie.hasNext()) {
 			Edge t = ie.next();
-			int a = g.getNode(t.getInt("source")).getInt("leader"), b = g.getNode(t.getInt("target")).getInt("leader");
-			if(a != b)
+			int a = g.getNode(t.getInt("source")).getInt("leader"), b = g
+					.getNode(t.getInt("target")).getInt("leader");
+			if (a != b)
 				sccG.addEdge(leaderMap[a], leaderMap[b]);
 		}
-		
+
 		Graph sg2 = new Graph(true);
 		sg2.addColumn("subGraph", Graph.class);
 		sg2.addColumn("0", int.class);
@@ -168,13 +172,13 @@ public class AnalysisDirected {
 		sg2.addColumn("id", int.class);
 		Iterator<Node> in = sccG.nodes();
 		int i = 0;
-		while(in.hasNext())	{
+		while (in.hasNext()) {
 			Node t = in.next();
 			if (t.getInt("size") > 2)
 				System.out.println(t.getInt("size"));
-			if(!t.edges().hasNext())
+			if (!t.edges().hasNext())
 				sccG.removeNode(t);
-			else	{
+			else {
 				Node u = sg2.addNode();
 				u.set("subGraph", t.get("subGraph"));
 				u.set("0", t.get("0"));
@@ -182,18 +186,17 @@ public class AnalysisDirected {
 				u.set("size", t.get("size"));
 				u.set("label", t.get("label"));
 				u.set("id", i);
-				t.set("id",i++);
+				t.set("id", i++);
 			}
 		}
-		
+
 		Iterator<Edge> ed = sccG.edges();
-		while(ed.hasNext())	{
+		while (ed.hasNext()) {
 			Edge a = ed.next();
-			sg2.addEdge(a.getSourceNode().getInt("id"), a.getTargetNode().getInt("id"));
+			sg2.addEdge(a.getSourceNode().getInt("id"), a.getTargetNode()
+					.getInt("id"));
 		}
-		
-		
-		
+
 		return sg2;
 	}
 
@@ -220,12 +223,12 @@ public class AnalysisDirected {
 	}
 
 	public static tuple countTriangles(Graph g) {
-		tuple c = new tuple(0,0.0);
+		tuple c = new tuple(0, 0.0);
 		g.addColumn("Numerator", int.class, 0);
 		g.addColumn("Triangles", int.class, 0);
 		g.addColumn("localClusteringCoefficient", double.class, 0);
 		g.addColumn("close", HashSet.class, null);
-		for(int i=0; i<g.getNodeCount(); ++i)
+		for (int i = 0; i < g.getNodeCount(); ++i)
 			g.getNode(i).set("close", new HashSet<Node>());
 		Iterator<Node> nodes = g.nodes();
 		while (nodes.hasNext()) {
@@ -234,60 +237,66 @@ public class AnalysisDirected {
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
 				if (t.getInt("id") > s.getInt("id")) {
-					Set<Node> intersection = new HashSet((HashSet<Node>) s.get("close"));
+					Set<Node> intersection = new HashSet<Node>(
+							(HashSet<Node>) s.get("close"));
 					intersection.retainAll((HashSet<Node>) t.get("close"));
 					int n = intersection.size();
 					c.Triangles += n;
-					s.setInt("Triangles", s.getInt("Triangles")+n);
-					t.setInt("Triangles", t.getInt("Triangles")+n);
+					s.setInt("Triangles", s.getInt("Triangles") + n);
+					t.setInt("Triangles", t.getInt("Triangles") + n);
 					Iterator<Node> i = intersection.iterator();
-					while (i.hasNext())
-					{
+					while (i.hasNext()) {
 						Node temp = i.next();
-						int k = ((g.getEdge(s,t)==null?0:1)+(g.getEdge(t,s)==null?0:1))*((g.getEdge(s,temp)==null?0:1)+(g.getEdge(temp,s)==null?0:1))*((g.getEdge(temp,t)==null?0:1)+(g.getEdge(t,temp)==null?0:1));
-						s.setInt("Numerator", s.getInt("Numerator")+k);
-						t.setInt("Numerator", t.getInt("Numerator")+k);
-						temp.setInt("Numerator", temp.getInt("Numerator")+k);
-						temp.setInt("Triangles", temp.getInt("Triangles")+1);
+						int k = ((g.getEdge(s, t) == null ? 0 : 1) + (g
+								.getEdge(t, s) == null ? 0 : 1))
+								* ((g.getEdge(s, temp) == null ? 0 : 1) + (g
+										.getEdge(temp, s) == null ? 0 : 1))
+								* ((g.getEdge(temp, t) == null ? 0 : 1) + (g
+										.getEdge(t, temp) == null ? 0 : 1));
+						s.setInt("Numerator", s.getInt("Numerator") + k);
+						t.setInt("Numerator", t.getInt("Numerator") + k);
+						temp.setInt("Numerator", temp.getInt("Numerator") + k);
+						temp.setInt("Triangles", temp.getInt("Triangles") + 1);
 					}
 					((HashSet<Node>) t.get("close")).add(s);
 				}
 			}
 		}
 		Iterator<Node> node = g.nodes();
-		int [] Triangles = new int[g.getNodeCount()];
-		int [] Degrees = new int[g.getNodeCount()];
+		int[] Triangles = new int[g.getNodeCount()];
+		int[] Degrees = new int[g.getNodeCount()];
 		int i = 0;
-		while (node.hasNext())
-		{
+		while (node.hasNext()) {
 			Node temp = node.next();
 			int n = temp.getDegree();
 			int d = 0;
 			Iterator<Node> I = temp.outNeighbors();
-			while (I.hasNext())
-			{
+			while (I.hasNext()) {
 				Node t = I.next();
-				if (g.getEdge(t,temp)!=null)
+				if (g.getEdge(t, temp) != null)
 					d++;
 			}
-			int denominator = 2*((n*(n-1)) - 2*d);
-			temp.setDouble("localClusteringCoefficient", (denominator>0)?(temp.getInt("Numerator"))/(double)denominator:0);
+			int denominator = 2 * ((n * (n - 1)) - 2 * d);
+			temp.setDouble("localClusteringCoefficient",
+					(denominator > 0) ? (temp.getInt("Numerator"))
+							/ (double) denominator : 0);
 			c.Clustering += temp.getDouble("localClusteringCoefficient");
 			Triangles[i] = temp.getInt("Triangles");
 			Degrees[i++] = temp.getDegree();
 		}
-		c.Clustering /= (double)(g.getNodeCount());
+		c.Clustering /= (double) (g.getNodeCount());
 		Statistics st = new Statistics();
 		c.Pearson = st.PearsonStatistic(Triangles, Degrees);
 		return c;
 	}
-	
+
 	public static int classifyEdges(Graph g) {
 		int sameEdge = 0;
 		Iterator<Edge> i = g.edges();
 		while (i.hasNext()) {
 			Edge temp = i.next();
-			if (temp.getSourceNode().getString("value").equals(temp.getTargetNode().getString("value")))
+			if (temp.getSourceNode().getString("value")
+					.equals(temp.getTargetNode().getString("value")))
 				sameEdge++;
 		}
 		return sameEdge;
@@ -305,38 +314,26 @@ public class AnalysisDirected {
 		tuple t = countTriangles(f);
 		bw.write("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\"");
 		bw.newLine();
-		bw.write("polblogs.xml,"+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson);
+		bw.write("polblogs.xml," + t.Clustering + ","
+				+ ((double) classifyEdges(f) / f.getEdgeCount()) + ","
+				+ t.Pearson);
 		bw.newLine();
-		for (int j=1; j<=50; j++)
-		{
-			String filename = "polblogs_rand_"+j+".xml";
-			f = new GraphMLReader().readGraph("polblogs_rand_\\"+filename);
+		for (int j = 1; j <= 50; j++) {
+			String filename = "polblogs_rand_" + j + ".xml";
+			f = new GraphMLReader().readGraph("polblogs_rand_\\" + filename);
 			f.addColumn("id", int.class);
 			n = f.nodes();
 			i = 0;
-			while(n.hasNext())	{
+			while (n.hasNext()) {
 				n.next().set("id", i++);
 
 			}
 			t = countTriangles(f);
-			bw.write(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson);
+			bw.write(filename + "," + t.Clustering + ","
+					+ ((double) classifyEdges(f) / f.getEdgeCount()) + ","
+					+ t.Pearson);
 			bw.newLine();
 		}
-//		Graph g = (Graph) setSCC(polbooks);
-//		int c = 0;
-//		for (i = 0; i < g.getNodeCount(); ++i)
-//			if (g.getNode(i).getInt("size") > 1) {
-//				// g = (Graph) g.getNode(i).get("subGraph");
-//				// System.out.println(g.getNode(i).getInt("size"));
-//				c++;
-//		//		System.out.println(((Graph)g.getNode(i).get("subGraph")).getNodeCount());
-//
-//		UILib.setPlatformLookAndFeel();
-//		GraphicsEnvironment e = GraphicsEnvironment
-//				.getLocalGraphicsEnvironment();
-//		JFrame frame = GraphView.demo(g,"id");
-//
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		bw.close();
 		FileOutputStream fos = new FileOutputStream("polblogsAnalysis.csv");
 		Table tb = nodalAnalysis(f);

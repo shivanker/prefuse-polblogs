@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.omg.CORBA.ExceptionList;
-
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
@@ -62,11 +60,10 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 						Integer.parseInt(tokens[j + 1]);
 						nodeData.addColumn(tokens[j], int.class);
 					} catch (Exception e) {
-						try	{
+						try {
 							Long.parseLong(tokens[j + 1]);
 							nodeData.addColumn(tokens[j], long.class);
-						}
-						catch(Exception e1)	{
+						} catch (Exception e1) {
 							nodeData.addColumn(tokens[j], double.class);
 						}
 					}
@@ -87,11 +84,10 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 						Integer.parseInt(tokens[j + 1]);
 						edgeData.addColumn(tokens[j], int.class);
 					} catch (Exception e) {
-						try	{
+						try {
 							Long.parseLong(tokens[j + 1]);
 							edgeData.addColumn(tokens[j], long.class);
-						}
-						catch(Exception e2)	{
+						} catch (Exception e2) {
 							edgeData.addColumn(tokens[j], double.class);
 						}
 					}
@@ -117,21 +113,17 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 			if (tokens[i].equals("node")) {
 				Node n1 = g.addNode();
 				i += 2;
-				// System.out.print("Adding node ");
 				while (!tokens[i].equals("]")) {
 					if (tokens[i + 1].charAt(0) == '\"')
 						tokens[i + 1] = tokens[i + 1].substring(1,
 								tokens[i + 1].length() - 1);
 					n1.set(tokens[i], tokens[i + 1]);
-					// System.out.print(tokens[i]+" = "+tokens[i+1]+"; ");
 					i += 2;
 				}
-				// System.out.println();
 			}
 
 			// Adding edge data
 			else if (tokens[i].equals("edge")) {
-//				System.out.println("\nAdding edge ");
 				i += 2;
 				j = i;
 				int source = -1, target = -1;
@@ -144,8 +136,6 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 				}
 				if (source == 1490 && target == 802)
 					System.out.println("Lets start");
-//				System.out.println("source = " + source + "; target = "
-//						+ target);
 				Edge e1 = g.getEdge(g.addEdge(source, target));
 
 				while (!tokens[i].equals("]")) {
@@ -155,7 +145,6 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 							tokens[i + 1] = tokens[i + 1].substring(1,
 									tokens[i + 1].length() - 1);
 						e1.set(tokens[i], tokens[i + 1]);
-//						System.out.print("; "+tokens[i]+" = "+tokens[i+1]);
 					}
 					i += 2;
 				}
@@ -167,6 +156,7 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 
 	public static void main(String... args) throws DataIOException {
 		String location = "polblogs.gml";
+		@SuppressWarnings("unused")
 		Graph g;
 		try {
 			InputStream is = IOLib.streamFromString(location);
@@ -177,7 +167,6 @@ public class gmlReader extends AbstractGraphReader implements GraphReader {
 		} catch (IOException e) {
 			throw new DataIOException(e);
 		}
-//		System.out.println(g.getEdge(791, 1407));
 
 	}
 }

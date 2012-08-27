@@ -12,6 +12,8 @@ import prefuse.data.io.GraphMLReader;
 public class connectedComponents {
 
 	static int size;
+
+	@SuppressWarnings("unchecked")
 	public static void DFS(Node n) {
 		n.setBoolean("explored", true);
 		size++;
@@ -23,29 +25,26 @@ public class connectedComponents {
 		}
 	}
 
-	public static LinkedList<Integer> components(Graph g)	{		
+	public static LinkedList<Integer> components(Graph g) {
 		g.addColumn("explored", boolean.class, false);
-		
+
 		LinkedList<Integer> result = new LinkedList<Integer>();
-		for(int i=0; i<g.getNodeCount(); ++i)
-			if(!g.getNode(i).getBoolean("explored"))	{
+		for (int i = 0; i < g.getNodeCount(); ++i)
+			if (!g.getNode(i).getBoolean("explored")) {
 				size = 0;
 				DFS(g.getNode(i));
 				result.add(size);
 			}
 		return result;
 	}
-	
+
 	public static void main(String[] args) throws DataIOException {
 		Graph g = new GraphMLReader().readGraph("polblogs.xml");
 		Object[] comps = components(g).toArray();
 		Arrays.sort(comps);
 		int n = comps.length;
-		System.out.println("Total number of disconnected components: " + comps[n-1]);
-		
-		/** It was found that polbooks is a connected graph,
-		 * while polblogs contains a total of 269 disconnected components,
-		 * of which,  one is of size 1221, one is a pair, while all others are singlets.*/ 
+		System.out.println("Total number of disconnected components: "
+				+ comps[n - 1]);
 	}
 
 }

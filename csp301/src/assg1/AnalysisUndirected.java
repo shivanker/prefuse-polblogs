@@ -17,6 +17,7 @@ import prefuse.data.io.CSVTableWriter;
 import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
 
+@SuppressWarnings("unchecked")
 public class AnalysisUndirected {
 	static Stack<Node> s = new Stack<Node>();
 
@@ -66,7 +67,7 @@ public class AnalysisUndirected {
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
 				if (t.getInt("id") > s.getInt("id")) {
-					Set<Node> intersection = new HashSet((HashSet<Node>) s.get("close"));
+					Set<Node> intersection = new HashSet<Node>((HashSet<Node>) s.get("close"));
 					intersection.retainAll((HashSet<Node>) t.get("close"));
 					int n = intersection.size();
 					c.Triangles += n;

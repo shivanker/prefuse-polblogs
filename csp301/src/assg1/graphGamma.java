@@ -6,17 +6,13 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -91,9 +87,6 @@ public class graphGamma extends JPanel {
 
 		// --------------------------------------------------------------------
 		// set up the renderers
-		// ShapeRenderer sr = new ShapeRenderer();
-		// LabelRenderer tr = new LabelRenderer();
-		// tr.setRoundedCorner(20, 20);
 
 		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,
 				Constants.EDGE_ARROW_FORWARD);
@@ -230,12 +223,6 @@ public class graphGamma extends JPanel {
 		m_vis.runAfter("draw", "layout");
 		m_vis.putAction("layout", color);
 
-		Image img = null;
-		try {
-			img = ImageIO.read(new File("test1.jpg"));
-		} catch (IOException e) {
-			System.err.println("Background Image File Not Found");
-		}
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
 		Display display = new Display(m_vis);
@@ -256,11 +243,6 @@ public class graphGamma extends JPanel {
 		display.addControlListener(new NeighborHighlightControl());
 		display.addControlListener(new modToolTip());
 		display.addControlListener(new sccOpener());
-
-		// // overview display
-		// Display overview = new Display(m_vis);
-		// overview.setSize(290, 290);
-		// overview.addItemBoundsListener(new FitOverviewListener());
 
 		// --------------------------------------------------------------------
 		// launch the visualization
@@ -348,11 +330,6 @@ public class graphGamma extends JPanel {
 
 		fpanel.add(box);
 		fpanel.add(Box.createVerticalGlue());
-		// fpanel.add(overview);
-
-		// Box radioBox = new Box(BoxLayout.X_AXIS);
-		// UILib.setFont(radioBox, FontLib.getFont("Tahoma", 15));
-		// radioBox.setBorder(BorderFactory.createTitledBorder("Radio Box"));
 
 		// create a new JSplitPane to present the interface
 		JSplitPane split = new JSplitPane();
@@ -361,13 +338,11 @@ public class graphGamma extends JPanel {
 		split.setOneTouchExpandable(true);
 		split.setContinuousLayout(false);
 		split.setDividerLocation(1000);
-		// split.setTopComponent(topPanel);
 
 		// now we run our action list
 		m_vis.run("draw");
 
 		add(split);
-		// add(radioBox, BorderLayout.NORTH);
 
 	}
 
@@ -399,17 +374,14 @@ public class graphGamma extends JPanel {
 
 		frame.setMaximizedBounds(e.getMaximumWindowBounds());
 		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// frame.setVisible(true);
 	}
 
 	public static JFrame demo(String datafile) {
 		Graph g = null;
 		try {
 			g = new GraphMLReader().readGraph(datafile);
-			// System.out.print(g.isDirected());
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -417,6 +389,7 @@ public class graphGamma extends JPanel {
 
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
+			@SuppressWarnings("unchecked")
 			Iterator<Node> n = g.nodes();
 			int i = 0;
 			while (n.hasNext()) {
@@ -432,6 +405,7 @@ public class graphGamma extends JPanel {
 		g = AnalysisDirected.setSCC(g);
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
+			@SuppressWarnings("unchecked")
 			Iterator<Node> n = g.nodes();
 			int i = 0;
 			while (n.hasNext()) {
@@ -461,27 +435,6 @@ public class graphGamma extends JPanel {
 		return frame;
 	}
 
-	// public static class FitOverviewListener implements ItemBoundsListener {
-	// private Rectangle2D m_bounds = new Rectangle2D.Double();
-	// private Rectangle2D m_temp = new Rectangle2D.Double();
-	// private double m_d = 15;
-	//
-	// public void itemBoundsChanged(Display d) {
-	// d.getItemBounds(m_temp);
-	// GraphicsLib.expand(m_temp, 25 / d.getScale());
-	//
-	// double dd = m_d / d.getScale();
-	// double xd = Math.abs(m_temp.getMinX() - m_bounds.getMinX());
-	// double yd = Math.abs(m_temp.getMinY() - m_bounds.getMinY());
-	// double wd = Math.abs(m_temp.getWidth() - m_bounds.getWidth());
-	// double hd = Math.abs(m_temp.getHeight() - m_bounds.getHeight());
-	// if (xd > dd || yd > dd || wd > dd || hd > dd) {
-	// m_bounds.setFrame(m_temp);
-	// DisplayLib.fitViewToBounds(d, m_bounds, 0);
-	// }
-	// }
-	// }
-
 	class nodeRenderer extends ShapeRenderer {
 
 		@Override
@@ -505,33 +458,6 @@ public class graphGamma extends JPanel {
 			}
 
 			return ellipse(x, y, width, width);
-
-			// switch ( stype ) {
-			// case Constants.SHAPE_NONE:
-			// return null;
-			// case Constants.SHAPE_RECTANGLE:
-			// return rectangle(x, y, width, width);
-			// case Constants.SHAPE_ELLIPSE:
-			// return ellipse(x, y, width, width);
-			// case Constants.SHAPE_TRIANGLE_UP:
-			// return triangle_up((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_DOWN:
-			// return triangle_down((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_LEFT:
-			// return triangle_left((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_RIGHT:
-			// return triangle_right((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_CROSS:
-			// return cross((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_STAR:
-			// return star((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_HEXAGON:
-			// return hexagon((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_DIAMOND:
-			// return diamond((float)x, (float)y, (float)width);
-			// default:
-			// throw new IllegalStateException("Unknown shape type: "+stype);
-			// }
 		}
 
 	}
@@ -547,18 +473,20 @@ public class graphGamma extends JPanel {
 
 	class modToolTip extends ToolTipControl {
 
-		public modToolTip()	{
+		public modToolTip() {
 			super(new String[0]);
 		}
+
 		public modToolTip(String field) {
 			super(field);
 		}
 
 		@Override
 		public void itemEntered(VisualItem item, MouseEvent e) {
-			Display d = (Display)e.getSource();
-	            if ( item.canGetString("size") )
-	                d.setToolTipText("Super-node (SCC) of size: " + item.getString("size"));
+			Display d = (Display) e.getSource();
+			if (item.canGetString("size"))
+				d.setToolTipText("Super-node (SCC) of size: "
+						+ item.getString("size"));
 		}
 	}
 

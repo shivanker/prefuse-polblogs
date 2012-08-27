@@ -6,19 +6,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -66,7 +61,6 @@ import prefuse.util.GraphicsLib;
 import prefuse.util.display.DisplayLib;
 import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.force.DragForce;
-import prefuse.util.force.EulerIntegrator;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
 import prefuse.util.force.SpringForce;
@@ -86,7 +80,7 @@ public class graphAlpha extends JPanel {
 	private static final String nodes = "graph.nodes";
 	private static final String edges = "graph.edges";
 	private static int degreeMedian;
-	
+
 	private Visualization m_vis;
 
 	public graphAlpha(Graph g, String label) {
@@ -97,18 +91,14 @@ public class graphAlpha extends JPanel {
 
 		// --------------------------------------------------------------------
 		// set up the renderers
-		// ShapeRenderer sr = new ShapeRenderer();
-		// LabelRenderer tr = new LabelRenderer();
-		// tr.setRoundedCorner(20, 20);
-		
-		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,Constants.EDGE_ARROW_FORWARD);
+
+		EdgeRenderer er = new EdgeRenderer(Constants.EDGE_TYPE_LINE,
+				Constants.EDGE_ARROW_FORWARD);
 		nodeRenderer nr = new nodeRenderer();
-		m_vis.setRendererFactory(new DefaultRendererFactory(nr,er));
-		
+		m_vis.setRendererFactory(new DefaultRendererFactory(nr, er));
+
 		er.setArrowHeadSize(5, 5);
 		er.setDefaultLineWidth(0.1);
-		
-		
 
 		// --------------------------------------------------------------------
 		// register the data with a visualization
@@ -117,7 +107,7 @@ public class graphAlpha extends JPanel {
 
 		// fix selected focus nodes
 		TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS);
-		
+
 		focusGroup.addTupleSetListener(new TupleSetListener() {
 			public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
 				for (int i = 0; i < rem.length; ++i)
@@ -125,11 +115,11 @@ public class graphAlpha extends JPanel {
 				for (int i = 0; i < add.length; ++i) {
 					((VisualItem) add[i]).setFixed(false);
 					((VisualItem) add[i]).setFixed(true);
-				}				
+				}
 				if (ts.getTupleCount() == 0) {
 					ts.addTuple(rem[0]);
 					((VisualItem) rem[0]).setFixed(false);
-				}				
+				}
 				m_vis.run("draw");
 			}
 		});
@@ -140,39 +130,41 @@ public class graphAlpha extends JPanel {
 		final GraphDistanceFilter filter = new GraphDistanceFilter(graph, hops);
 
 		// color set for default node
-		int[] palette = new int[] { 
-				ColorLib.rgba(255, 200, 200, 250),
+		int[] palette = new int[] { ColorLib.rgba(255, 200, 200, 250),
 				ColorLib.rgba(200, 255, 200, 250),
-				ColorLib.rgba(200, 200, 255, 250) 
-				};
+				ColorLib.rgba(200, 200, 255, 250) };
 		// color set for highlighted node
-		int[] palette2 = new int[] { 
-				ColorLib.rgba(255, 20, 147, 200),
-				ColorLib.rgba(0, 128, 0, 200),
-				ColorLib.rgba(0, 0, 128, 200) 
-				};
+		int[] palette2 = new int[] { ColorLib.rgba(255, 20, 147, 200),
+				ColorLib.rgba(0, 128, 0, 200), ColorLib.rgba(0, 0, 128, 200) };
 
 		// map nominal data values to colors using our provided palette
-		DataColorAction fill = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-		DataColorAction fill2 = new DataColorAction(nodes, "value",Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
+		DataColorAction fill = new DataColorAction(nodes, "value",
+				Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+		DataColorAction fill2 = new DataColorAction(nodes, "value",
+				Constants.NOMINAL, VisualItem.FILLCOLOR, palette2);
 		fill.add(VisualItem.FIXED, ColorLib.rgba(0, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, fill2);
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
 
 		// use white for node text
-		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,ColorLib.gray(0));
+		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,
+				ColorLib.gray(0));
 		text.add("ingroup('_search_')", ColorLib.rgb(255, 255, 255));
 
 		// use light grey for edges
-		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(200));
+		ColorAction edge = new ColorAction(edges, VisualItem.STROKECOLOR,
+				ColorLib.gray(200));
 		// use dark light grey for edges
-		ColorAction edge1 = new ColorAction(edges, VisualItem.FILLCOLOR,ColorLib.gray(150));
-		
-		ColorAction edge2 = new ColorAction(edges, VisualItem.STROKECOLOR,ColorLib.gray(50));
-		ColorAction edge3 = new ColorAction(edges, VisualItem.FILLCOLOR,ColorLib.gray(50));
-		edge.add(VisualItem.HIGHLIGHT,edge2);
+		ColorAction edge1 = new ColorAction(edges, VisualItem.FILLCOLOR,
+				ColorLib.gray(150));
+
+		ColorAction edge2 = new ColorAction(edges, VisualItem.STROKECOLOR,
+				ColorLib.gray(50));
+		ColorAction edge3 = new ColorAction(edges, VisualItem.FILLCOLOR,
+				ColorLib.gray(50));
+		edge.add(VisualItem.HIGHLIGHT, edge2);
 		edge1.add(VisualItem.HIGHLIGHT, edge3);
-		
+
 		// animate paint change
 		ActionList animatePaint = new ActionList(1000);
 		animatePaint.add(new ColorAnimator(nodes));
@@ -212,8 +204,7 @@ public class graphAlpha extends JPanel {
 		ActionList animate = new ActionList(30000);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(new RepaintAction());
-		
-		
+
 		// finally, we register our ActionList with the Visualization.
 		// we can later execute our Actions by invoking a method on our
 		// Visualization, using the name we've chosen below.
@@ -221,20 +212,12 @@ public class graphAlpha extends JPanel {
 		m_vis.putAction("layout", animate);
 		m_vis.runAfter("draw", "layout");
 		m_vis.putAction("layout", color);
-		
-		Image img=null;
-		try{
-			img = ImageIO.read(new File("test1.jpg"));
-		}
-		catch(IOException e){
-			System.err.println("Background Image File Not Found");
-		}
+
 		// --------------------------------------------------------------------
 		// set up a display to show the visualization
 		Display display = new Display(m_vis);
 		display.setSize(1000, 700);
 		display.pan(500, 350);
-		//display.setBackgroundImage(img, true, true);
 		display.zoom(new Point2D.Float(500, 350), 1.5);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
@@ -348,10 +331,6 @@ public class graphAlpha extends JPanel {
 		fpanel.add(Box.createVerticalGlue());
 		fpanel.add(overview);
 
-		// Box radioBox = new Box(BoxLayout.X_AXIS);
-		// UILib.setFont(radioBox, FontLib.getFont("Tahoma", 15));
-		// radioBox.setBorder(BorderFactory.createTitledBorder("Radio Box"));
-
 		// create a new JSplitPane to present the interface
 		JSplitPane split = new JSplitPane();
 		split.setLeftComponent(display);
@@ -365,8 +344,6 @@ public class graphAlpha extends JPanel {
 		m_vis.run("draw");
 
 		add(split);
-		// add(radioBox, BorderLayout.NORTH);
-
 	}
 
 	public void setGraph(Graph g) {
@@ -399,10 +376,8 @@ public class graphAlpha extends JPanel {
 
 		frame.setMaximizedBounds(e.getMaximumWindowBounds());
 		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// frame.setVisible(true);
 	}
 
 	public static JFrame demo() {
@@ -413,7 +388,6 @@ public class graphAlpha extends JPanel {
 		Graph g = null;
 		try {
 			g = new GraphMLReader().readGraph(datafile);
-			// System.out.print(g.isDirected());
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -426,21 +400,22 @@ public class graphAlpha extends JPanel {
 
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
+			@SuppressWarnings("unchecked")
 			Iterator<Node> n = g.nodes();
 			int i = 0;
 			while (n.hasNext()) {
 				n.next().set("id", i++);
 			}
 		}
-		
+
 		int[] degs = new int[g.getNodeCount()];
 		g.addColumn("degree", int.class);
-		for(int i=0; i < g.getNodeCount(); ++i)	{
+		for (int i = 0; i < g.getNodeCount(); ++i) {
 			g.getNode(i).set("degree", g.getDegree(i));
 			degs[i] = g.getDegree(i);
 		}
-		degreeMedian = Statistics.median(degs, 0, degs.length-1);
-		
+		degreeMedian = Statistics.median(degs, 0, degs.length - 1);
+
 		final graphAlpha view = new graphAlpha(g, label);
 
 		// launch window
@@ -502,42 +477,7 @@ public class graphAlpha extends JPanel {
 				y = y - width / 2;
 			}
 
-//			if (!item.canGet("value", String.class))
-//				return ellipse(x, y, width, width);
-//			String v = "" + item.get("value");
-//			if (v.equals("c"))
-//				return rectangle(x, y, width, width);
-//			else if (v.equals("n"))
-//				return triangle_down((float) x, (float) y, (float) width);
-//			else
-				return ellipse(x, y, width, width);
-
-			// switch ( stype ) {
-			// case Constants.SHAPE_NONE:
-			// return null;
-			// case Constants.SHAPE_RECTANGLE:
-			// return rectangle(x, y, width, width);
-			// case Constants.SHAPE_ELLIPSE:
-			// return ellipse(x, y, width, width);
-			// case Constants.SHAPE_TRIANGLE_UP:
-			// return triangle_up((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_DOWN:
-			// return triangle_down((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_LEFT:
-			// return triangle_left((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_TRIANGLE_RIGHT:
-			// return triangle_right((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_CROSS:
-			// return cross((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_STAR:
-			// return star((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_HEXAGON:
-			// return hexagon((float)x, (float)y, (float)width);
-			// case Constants.SHAPE_DIAMOND:
-			// return diamond((float)x, (float)y, (float)width);
-			// default:
-			// throw new IllegalStateException("Unknown shape type: "+stype);
-			// }
+			return ellipse(x, y, width, width);
 		}
 
 	}
