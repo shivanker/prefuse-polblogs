@@ -312,6 +312,11 @@ public class AnalysisDirected {
 		}
 		BufferedWriter bw = new BufferedWriter(new FileWriter("blogsGraphAnalysis.csv"));
 		tuple t = countTriangles(f);
+		FileOutputStream fos = new FileOutputStream("polblogsAnalysis.csv");
+		Table tb = nodalAnalysis(f);
+		CSVTableWriter tw = new CSVTableWriter();
+		tw.writeTable(tb, fos);
+		fos.close();
 		bw.write("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\"");
 		bw.newLine();
 		bw.write("polblogs.xml," + t.Clustering + ","
@@ -335,10 +340,5 @@ public class AnalysisDirected {
 			bw.newLine();
 		}
 		bw.close();
-		FileOutputStream fos = new FileOutputStream("polblogsAnalysis.csv");
-		Table tb = nodalAnalysis(f);
-		CSVTableWriter tw = new CSVTableWriter();
-		tw.writeTable(tb, fos);
-		fos.close();
 	}
 }

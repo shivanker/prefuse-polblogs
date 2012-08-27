@@ -29,11 +29,14 @@ public class AnalysisUndirected {
 		tb.addColumn("Conservative", int.class, 0);
 		tb.addColumn("Liberal", int.class, 0);
 		tb.addColumn("Neutral", int.class, 0);
+		tb.addColumn("Total", int.class, 0);
+		
 		tb.addRows(g.getNodeCount());
+		int ind = 0;
 		while (nodes.hasNext()) {
 			Node temp = nodes.next();
 			Iterator<Node> neighbor = temp.neighbors();
-			int c = 0, l = 0, n = 0;
+			int c = 0, l = 0, n = 0, tot = 0;
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
 				if (t.get("value").equals("c"))
@@ -42,12 +45,15 @@ public class AnalysisUndirected {
 					l++;
 				else
 					n++;
+				tot++;
 			}
-			tb.setInt((int) temp.get("id"), "Conservative", c);
-			tb.setInt((int) temp.get("id"), "Liberal", l);
-			tb.setInt((int) temp.get("id"), "Neutral", n);
-			tb.setString((int) temp.get("id"), "Affliation", (String) temp.get("value"));
-			tb.setString((int) temp.get("id"), "Name", (String) temp.get("label"));
+			tb.setInt(ind, "Conservative", c);
+			tb.setInt(ind, "Liberal", l);
+			tb.setInt(ind, "Neutral", n);
+			tb.setInt(ind, "Total", tot);
+			tb.setString(ind, "Affliation", (String) temp.get("value"));
+			tb.setString(ind, "Name", (String) temp.get("label"));
+			ind++;
 		}
 		return tb;
 	}
@@ -113,6 +119,13 @@ public class AnalysisUndirected {
 
 	public static void main(String... args) throws DataIOException, IOException	{
 		Graph g = new GraphMLReader().readGraph("polbooks.xml");
+		
+		FileOutputStream fos = new FileOutputStream("polbooksAnalysis.csv");
+		Table tb = nodalAnalysis(g);
+		CSVTableWriter tw = new CSVTableWriter();
+		tw.writeTable(tb, fos);
+		fos.close();
+		
 		BufferedWriter bw = new BufferedWriter(new FileWriter("booksGraphAnalysis.csv"));
 		g.addColumn("id", int.class);
 		Iterator<Node> n = g.nodes();
@@ -120,6 +133,7 @@ public class AnalysisUndirected {
 		while(n.hasNext())	{
 			n.next().set("id", i++);
 		}
+		
 		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
 		bw.write("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\"");
 		bw.newLine();
@@ -140,11 +154,7 @@ public class AnalysisUndirected {
 			bw.newLine();
 		}
 		bw.close();
-		FileOutputStream fos = new FileOutputStream("polbooksAnalysis.csv");
-		Table tb = nodalAnalysis(g);
-		CSVTableWriter tw = new CSVTableWriter();
-		tw.writeTable(tb, fos);
-		fos.close();
+		
 	}
 	static long nC3(int n)
 	{
