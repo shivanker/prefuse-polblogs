@@ -1,6 +1,7 @@
 package assg1;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Table;
+import prefuse.data.io.CSVTableWriter;
 import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
 
@@ -24,6 +26,8 @@ public class AnalysisUndirected {
 		tb.addColumn("Conservative", int.class, 0);
 		tb.addColumn("Liberal", int.class, 0);
 		tb.addColumn("Neutral", int.class, 0);
+		tb.addColumn("Affliation", String.class);
+		tb.addColumn("Name", String.class);
 		tb.addRows(g.getNodeCount());
 		while (nodes.hasNext()) {
 			Node temp = nodes.next();
@@ -31,9 +35,9 @@ public class AnalysisUndirected {
 			int c = 0, l = 0, n = 0;
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
-				if (t.get("value") == "c")
+				if (t.get("value").equals("c"))
 					c++;
-				else if (t.get("value") == "l")
+				else if (t.get("value").equals("l"))
 					l++;
 				else
 					n++;
@@ -41,6 +45,8 @@ public class AnalysisUndirected {
 			tb.setInt((int) temp.get("id"), "Conservative", c);
 			tb.setInt((int) temp.get("id"), "Liberal", l);
 			tb.setInt((int) temp.get("id"), "Neutral", n);
+			tb.setString((int) temp.get("id"), "Affliation", (String) temp.get("value"));
+			tb.setString((int) temp.get("id"), "Name", (String) temp.get("label"));
 		}
 		return tb;
 	}
@@ -106,7 +112,7 @@ public class AnalysisUndirected {
 
 	public static void main(String... args) throws DataIOException, IOException	{
 		Graph g = new GraphMLReader().readGraph("polbooks.xml");
-		BufferedWriter bw = new BufferedWriter(new FileWriter("polbooksAnalysis.csv"));
+		BufferedWriter bw = new BufferedWriter(new FileWriter("booksGraphAnalysis.csv"));
 		g.addColumn("id", int.class);
 		Iterator<Node> n = g.nodes();
 		int i = 0;
@@ -133,6 +139,11 @@ public class AnalysisUndirected {
 			bw.newLine();
 		}
 		bw.close();
+		FileOutputStream fos = new FileOutputStream("polbooksAnalysis.csv");
+		Table tb = nodalAnalysis(g);
+		CSVTableWriter tw = new CSVTableWriter();
+		tw.writeTable(tb, fos);
+		fos.close();
 	}
 	static long nC3(int n)
 	{
