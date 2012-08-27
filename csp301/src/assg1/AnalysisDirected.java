@@ -273,7 +273,6 @@ public class AnalysisDirected {
 		c.Clustering /= (double)(g.getNodeCount());
 		Statistics st = new Statistics();
 		c.Pearson = st.PearsonStatistic(Triangles, Degrees);
-		c.Spearman = st.SpearmanStatistic(Triangles, Degrees);
 		return c;
 	}
 	
@@ -298,9 +297,9 @@ public class AnalysisDirected {
 		}
 		BufferedWriter bw = new BufferedWriter(new FileWriter("polblogsAnalysis.csv"));
 		tuple t = countTriangles(f);
-		bw.write("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\",\"Spearman\'s Correlation Coefficient\"");
+		bw.write("\"File Name\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\"");
 		bw.newLine();
-		bw.write("polblogs.xml,"+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+		bw.write("polblogs.xml,"+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson);
 		bw.newLine();
 		for (int j=1; j<=50; j++)
 		{
@@ -314,7 +313,7 @@ public class AnalysisDirected {
 
 			}
 			t = countTriangles(f);
-			bw.write(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson+","+t.Spearman);
+			bw.write(filename+","+t.Clustering+","+((double)classifyEdges(f)/f.getEdgeCount())+","+t.Pearson);
 			bw.newLine();
 		}
 //		Graph g = (Graph) setSCC(polbooks);
