@@ -24,15 +24,19 @@ public class AnalysisUndirected {
 	public static Table nodalAnalysis(Graph g) {
 		Iterator<Node> nodes = g.nodes();
 		Table tb = new Table();
+		g.addColumn("Triangles", int.class, 0);
+		g.addColumn("close", HashSet.class, null);
+		for(int i=0; i<g.getNodeCount(); ++i)
+			g.getNode(i).set("close", new HashSet<Node>());
 		tb.addColumn("Name", String.class);
 		tb.addColumn("Affliation", String.class);
 		tb.addColumn("Conservative", int.class, 0);
 		tb.addColumn("Liberal", int.class, 0);
 		tb.addColumn("Neutral", int.class, 0);
 		tb.addColumn("Total", int.class, 0);
+		tb.addColumn("Triangles", int.class, 0);
 		
 		tb.addRows(g.getNodeCount());
-		int ind = 0;
 		while (nodes.hasNext()) {
 			Node temp = nodes.next();
 			Iterator<Node> neighbor = temp.neighbors();
@@ -46,14 +50,28 @@ public class AnalysisUndirected {
 				else
 					n++;
 				tot++;
+				if (temp.getInt("id") > t.getInt("id")) {
+					Set<Node> intersection = new HashSet<Node>((HashSet<Node>) t.get("close"));
+					intersection.retainAll((HashSet<Node>) temp.get("close"));
+					int n1 = intersection.size();
+					t.setInt("Triangles", t.getInt("Triangles")+n1);
+					temp.setInt("Triangles", temp.getInt("Triangles")+n1);
+					Iterator<Node> i = intersection.iterator();
+					while (i.hasNext())
+					{
+						Node nod = i.next();
+						nod.setInt("Triangles", nod.getInt("Triangles")+1);
+					}
+					((HashSet<Node>) temp.get("close")).add(t);
+				}
 			}
-			tb.setInt(ind, "Conservative", c);
-			tb.setInt(ind, "Liberal", l);
-			tb.setInt(ind, "Neutral", n);
-			tb.setInt(ind, "Total", tot);
-			tb.setString(ind, "Affliation", (String) temp.get("value"));
-			tb.setString(ind, "Name", (String) temp.get("label"));
-			ind++;
+			tb.setInt(temp.getInt("id"), "Conservative", c);
+			tb.setInt(temp.getInt("id"), "Liberal", l);
+			tb.setInt(temp.getInt("id"), "Neutral", n);
+			tb.setInt(temp.getInt("id"), "Total", tot);
+			tb.setInt(temp.getInt("id"), "Triangles", temp.getInt("Triangles"));
+			tb.setString(temp.getInt("id"), "Affliation", (String) temp.get("value"));
+			tb.setString(temp.getInt("id"), "Name", (String) temp.get("label"));
 		}
 		return tb;
 	}
@@ -119,6 +137,12 @@ public class AnalysisUndirected {
 
 	public static void main(String... args) throws DataIOException, IOException	{
 		Graph g = new GraphMLReader().readGraph("polbooks.xml");
+		g.addColumn("id", int.class);
+		Iterator<Node> n = g.nodes();
+		int i = 0;
+		while(n.hasNext())	{
+			n.next().set("id", i++);
+		}
 		
 		FileOutputStream fos = new FileOutputStream("polbooksAnalysis.csv");
 		Table tb = nodalAnalysis(g);
@@ -127,13 +151,7 @@ public class AnalysisUndirected {
 		fos.close();
 		
 		BufferedWriter bw = new BufferedWriter(new FileWriter("booksGraphAnalysis.csv"));
-		g.addColumn("id", int.class);
-		Iterator<Node> n = g.nodes();
-		int i = 0;
-		while(n.hasNext())	{
-			n.next().set("id", i++);
-		}
-		
+				
 		tuple t = countTrianglesAndNetworkClusteringCoefficient(g);
 		bw.write("\"File Name\",\"Global Clustering Coefficient\",\"Average Network Clustering Coefficient\",\"Edge Ratio\",\"Pearson\'s Correlation Coefficient\"");
 		bw.newLine();

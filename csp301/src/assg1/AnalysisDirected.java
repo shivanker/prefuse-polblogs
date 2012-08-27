@@ -22,26 +22,49 @@ public class AnalysisDirected {
 	static Stack<Node> s = new Stack<Node>();
 
 	public static Table nodalAnalysis(Graph g) {
+		g.addColumn("Triangles", int.class, 0);
+		g.addColumn("close", HashSet.class, null);
+		for(int i=0; i<g.getNodeCount(); ++i)
+			g.getNode(i).set("close", new HashSet<Node>());
 		Iterator<Node> nodes = g.nodes();
 		Table tb = new Table();
 		tb.addColumn("Name", String.class);
 		tb.addColumn("Affliation", String.class);
 		tb.addColumn("Conservative", int.class, 0);
 		tb.addColumn("Liberal", int.class, 0);
+		tb.addColumn("Total", int.class, 0);
+		tb.addColumn("Triangles", int.class, 0);
 		tb.addRows(g.getNodeCount());
 		while (nodes.hasNext()) {
 			Node temp = nodes.next();
 			Iterator<Node> neighbor = temp.neighbors();
-			int c = 0, l = 0;
+			int c = 0, l = 0, tot = 0;
 			while (neighbor.hasNext()) {
 				Node t = neighbor.next();
 				if (t.getInt("value") == 1)
 					c++;
 				else
 					l++;
+				tot++;
+				if (temp.getInt("id") > t.getInt("id")) {
+					Set<Node> intersection = new HashSet<Node>((HashSet<Node>) t.get("close"));
+					intersection.retainAll((HashSet<Node>) temp.get("close"));
+					int n1 = intersection.size();
+					t.setInt("Triangles", t.getInt("Triangles")+n1);
+					temp.setInt("Triangles", temp.getInt("Triangles")+n1);
+					Iterator<Node> i = intersection.iterator();
+					while (i.hasNext())
+					{
+						Node nod = i.next();
+						nod.setInt("Triangles", nod.getInt("Triangles")+1);
+					}
+					((HashSet<Node>) temp.get("close")).add(t);
+				}
 			}
 			tb.setInt((int) temp.get("id"), "Conservative", c);
 			tb.setInt((int) temp.get("id"), "Liberal", l);
+			tb.setInt(temp.getInt("id"), "Total", tot);
+			tb.setInt(temp.getInt("id"), "Triangles", temp.getInt("Triangles"));
 			tb.setString((int) temp.get("id"), "Affliation", (temp.getInt("value")==1)?"Conservative":"Liberal");
 			tb.setString((int) temp.get("id"), "Name", (String) temp.get("label"));
 		}
@@ -137,7 +160,6 @@ public class AnalysisDirected {
 				Node sn = sccG.addNode();
 				sn.set("subGraph", sgs[i]);
 				sn.set("id", l++);
-				// System.out.println(i+": "+sgs[i].getNodeCount());
 				sn.set("size", sgs[i].getNodeCount());
 				sn.set("0", 0);
 				sn.set("1", 0);
