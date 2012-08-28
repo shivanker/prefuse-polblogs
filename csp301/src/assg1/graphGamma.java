@@ -93,7 +93,7 @@ public class graphGamma extends JPanel {
 		nodeRenderer nr = new nodeRenderer();
 		m_vis.setRendererFactory(new DefaultRendererFactory(nr, er));
 
-		er.setArrowHeadSize(5, 5);
+		er.setArrowHeadSize(7, 10);
 		er.setDefaultLineWidth(0.7);
 
 		// --------------------------------------------------------------------
@@ -199,8 +199,8 @@ public class graphGamma extends JPanel {
 		draw.add(new RepaintAction());
 
 		ForceSimulator fsim = new ForceSimulator();
-		fsim.addForce(new NBodyForce(-2.6f, -1.0f, 0.9f));
-		fsim.addForce(new SpringForce());
+		fsim.addForce(new NBodyForce(-10.0f, -1.0f, 0.9f));
+		fsim.addForce(new SpringForce(0.00001f,180));
 		fsim.addForce(new DragForce(0.015f));
 
 		// create an action list containing all color assignments
@@ -212,7 +212,7 @@ public class graphGamma extends JPanel {
 		color.add(nStroke);
 		color.add(new RepaintAction());
 
-		ActionList animate = new ActionList(20000);
+		ActionList animate = new ActionList(Activity.INFINITY);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(new RepaintAction());
 
@@ -229,7 +229,7 @@ public class graphGamma extends JPanel {
 		Display display = new Display(m_vis);
 		display.setSize(1000, 700);
 		display.pan(500, 350);
-		display.zoom(new Point2D.Float(500, 350), 1.1);
+		display.zoom(new Point2D.Float(500, 350), 0.55);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
 
