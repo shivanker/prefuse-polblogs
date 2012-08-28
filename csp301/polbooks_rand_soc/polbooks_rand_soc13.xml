@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"> 
+<graph edgedefault="undirected"> 
+ 
+<!-- data schema --> 
+<key id="label" for="node" attr.name="label" attr.type="string"/> 
+<key id="value" for="node" attr.name="value" attr.type="string"/> 
+ 
+<!-- nodes --> 
+<node id="0"> 
+  <data key="label">1000 Years for Revenge</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="1"> 
+  <data key="label">Bush vs. the Beltway</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="2"> 
+  <data key="label">Charlie Wilson's War</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="3"> 
+  <data key="label">Losing Bin Laden</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="4"> 
+  <data key="label">Sleeping With the Devil</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="5"> 
+  <data key="label">The Man Who Warned America</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="6"> 
+  <data key="label">Why America Slept</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="7"> 
+  <data key="label">Ghost Wars</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="8"> 
+  <data key="label">A National Party No More</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="9"> 
+  <data key="label">Bush Country</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="10"> 
+  <data key="label">Dereliction of Duty</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="11"> 
+  <data key="label">Legacy</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="12"> 
+  <data key="label">Off with Their Heads</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="13"> 
+  <data key="label">Persecution</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="14"> 
+  <data key="label">Rumsfeld's War</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="15"> 
+  <data key="label">Breakdown</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="16"> 
+  <data key="label">Betrayal</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="17"> 
+  <data key="label">Shut Up and Sing</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="18"> 
+  <data key="label">Meant To Be</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="19"> 
+  <data key="label">The Right Man</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="20"> 
+  <data key="label">Ten Minutes from Normal</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="21"> 
+  <data key="label">Hillary's Scheme</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="22"> 
+  <data key="label">The French Betrayal of America</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="23"> 
+  <data key="label">Tales from the Left Coast</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="24"> 
+  <data key="label">Hating America</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="25"> 
+  <data key="label">The Third Terrorist</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="26"> 
+  <data key="label">Endgame</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="27"> 
+  <data key="label">Spin Sisters</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="28"> 
+  <data key="label">All the Shah's Men</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="29"> 
+  <data key="label">Dangerous Dimplomacy</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="30"> 
+  <data key="label">The Price of Loyalty</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="31"> 
+  <data key="label">House of Bush, House of Saud</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="32"> 
+  <data key="label">The Death of Right and Wrong</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="33"> 
+  <data key="label">Useful Idiots</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="34"> 
+  <data key="label">The O'Reilly Factor</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="35"> 
+  <data key="label">Let Freedom Ring</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="36"> 
+  <data key="label">Those Who Trespass</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="37"> 
+  <data key="label">Bias</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="38"> 
+  <data key="label">Slander</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="39"> 
+  <data key="label">The Savage Nation</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="40"> 
+  <data key="label">Deliver Us from Evil</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="41"> 
+  <data key="label">Give Me a Break</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="42"> 
+  <data key="label">The Enemy Within</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="43"> 
+  <data key="label">The Real America</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="44"> 
+  <data key="label">Who's Looking Out for You?</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="45"> 
+  <data key="label">The Official Handbook Vast Right Wing Conspiracy</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="46"> 
+  <data key="label">Power Plays</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="47"> 
+  <data key="label">Arrogance</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="48"> 
+  <data key="label">The Perfect Wife</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="49"> 
+  <data key="label">The Bushes</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="50"> 
+  <data key="label">Things Worth Fighting For</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="51"> 
+  <data key="label">Surprise, Security, the American Experience</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="52"> 
+  <data key="label">Allies</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="53"> 
+  <data key="label">Why Courage Matters</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="54"> 
+  <data key="label">Hollywood Interrupted</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="55"> 
+  <data key="label">Fighting Back</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="56"> 
+  <data key="label">We Will Prevail</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="57"> 
+  <data key="label">The Faith of George W Bush</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="58"> 
+  <data key="label">Rise of the Vulcans</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="59"> 
+  <data key="label">Downsize This!</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="60"> 
+  <data key="label">Stupid White Men</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="61"> 
+  <data key="label">Rush Limbaugh Is a Big Fat Idiot</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="62"> 
+  <data key="label">The Best Democracy Money Can Buy</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="63"> 
+  <data key="label">The Culture of Fear</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="64"> 
+  <data key="label">America Unbound</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="65"> 
+  <data key="label">The Choice</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="66"> 
+  <data key="label">The Great Unraveling</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="67"> 
+  <data key="label">Rogue Nation</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="68"> 
+  <data key="label">Soft Power</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="69"> 
+  <data key="label">Colossus</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="70"> 
+  <data key="label">The Sorrows of Empire</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="71"> 
+  <data key="label">Against All Enemies</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="72"> 
+  <data key="label">American Dynasty</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="73"> 
+  <data key="label">Big Lies</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="74"> 
+  <data key="label">The Lies of George W. Bush</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="75"> 
+  <data key="label">Worse Than Watergate</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="76"> 
+  <data key="label">Plan of Attack</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="77"> 
+  <data key="label">Bush at War</data> 
+  <data key="value">c</data> 
+</node> 
+<node id="78"> 
+  <data key="label">The New Pearl Harbor</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="79"> 
+  <data key="label">Bushwomen</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="80"> 
+  <data key="label">The Bubble of American Supremacy</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="81"> 
+  <data key="label">Living History</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="82"> 
+  <data key="label">The Politics of Truth</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="83"> 
+  <data key="label">Fanatics and Fools</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="84"> 
+  <data key="label">Bushwhacked</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="85"> 
+  <data key="label">Disarming Iraq</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="86"> 
+  <data key="label">Lies and the Lying Liars Who Tell Them</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="87"> 
+  <data key="label">MoveOn's 50 Ways to Love Your Country</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="88"> 
+  <data key="label">The Buying of the President 2004</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="89"> 
+  <data key="label">Perfectly Legal</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="90"> 
+  <data key="label">Hegemony or Survival</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="91"> 
+  <data key="label">The Exception to the Rulers</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="92"> 
+  <data key="label">Freethinkers</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="93"> 
+  <data key="label">Had Enough?</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="94"> 
+  <data key="label">It's Still the Economy, Stupid!</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="95"> 
+  <data key="label">We're Right They're Wrong</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="96"> 
+  <data key="label">What Liberal Media?</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="97"> 
+  <data key="label">The Clinton Wars</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="98"> 
+  <data key="label">Weapons of Mass Deception</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="99"> 
+  <data key="label">Dude, Where's My Country?</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="100"> 
+  <data key="label">Thieves in High Places</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="101"> 
+  <data key="label">Shrub</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="102"> 
+  <data key="label">Buck Up Suck Up</data> 
+  <data key="value">l</data> 
+</node> 
+<node id="103"> 
+  <data key="label">The Future of Freedom</data> 
+  <data key="value">n</data> 
+</node> 
+<node id="104"> 
+  <data key="label">Empire</data> 
+  <data key="value">n</data> 
+</node> 
+ 
+<!-- edges --> <edge source="0" target="1" />
+<edge source="2" target="0" />
+<edge source="0" target="3" />
+<edge source="4" target="1" />
+<edge source="3" target="5" />
+<edge source="6" target="1" />
+<edge source="1" target="7" />
+<edge source="0" target="8" />
+<edge source="8" target="5" />
+<edge source="9" target="0" />
+<edge source="8" target="10" />
+<edge source="11" target="0" />
+<edge source="12" target="0" />
+<edge source="1" target="12" />
+<edge source="6" target="12" />
+<edge source="12" target="13" />
+<edge source="8" target="14" />
+<edge source="15" target="12" />
+<edge source="16" target="1" />
+<edge source="16" target="8" />
+<edge source="17" target="1" />
+<edge source="18" target="5" />
+<edge source="6" target="19" />
+<edge source="8" target="19" />
+<edge source="20" target="1" />
+<edge source="21" target="7" />
+<edge source="22" target="8" />
+<edge source="23" target="3" />
+<edge source="1" target="24" />
+<edge source="3" target="24" />
+<edge source="7" target="24" />
+<edge source="25" target="16" />
+<edge source="0" target="26" />
+<edge source="27" target="1" />
+<edge source="12" target="28" />
+<edge source="29" target="20" />
+<edge source="5" target="30" />
+<edge source="31" target="7" />
+<edge source="18" target="31" />
+<edge source="32" target="27" />
+<edge source="7" target="33" />
+<edge source="33" target="8" />
+<edge source="3" target="34" />
+<edge source="35" target="1" />
+<edge source="36" target="0" />
+<edge source="37" target="3" />
+<edge source="12" target="38" />
+<edge source="39" target="0" />
+<edge source="8" target="39" />
+<edge source="14" target="39" />
+<edge source="0" target="40" />
+<edge source="40" target="1" />
+<edge source="8" target="41" />
+<edge source="14" target="42" />
+<edge source="43" target="1" />
+<edge source="19" target="44" />
+<edge source="0" target="45" />
+<edge source="45" target="3" />
+<edge source="45" target="8" />
+<edge source="17" target="46" />
+<edge source="47" target="15" />
+<edge source="48" target="6" />
+<edge source="7" target="48" />
+<edge source="28" target="48" />
+<edge source="14" target="49" />
+<edge source="19" target="49" />
+<edge source="50" target="45" />
+<edge source="51" target="5" />
+<edge source="0" target="52" />
+<edge source="52" target="1" />
+<edge source="0" target="53" />
+<edge source="8" target="54" />
+<edge source="54" target="33" />
+<edge source="8" target="55" />
+<edge source="56" target="6" />
+<edge source="57" target="1" />
+<edge source="33" target="58" />
+<edge source="59" target="14" />
+<edge source="60" target="0" />
+<edge source="61" target="18" />
+<edge source="61" target="27" />
+<edge source="62" target="7" />
+<edge source="1" target="63" />
+<edge source="64" target="0" />
+<edge source="8" target="64" />
+<edge source="64" target="12" />
+<edge source="27" target="64" />
+<edge source="1" target="65" />
+<edge source="38" target="66" />
+<edge source="62" target="66" />
+<edge source="67" target="3" />
+<edge source="67" target="48" />
+<edge source="64" target="67" />
+<edge source="61" target="68" />
+<edge source="69" target="1" />
+<edge source="10" target="69" />
+<edge source="69" target="14" />
+<edge source="5" target="70" />
+<edge source="31" target="70" />
+<edge source="14" target="71" />
+<edge source="72" target="8" />
+<edge source="48" target="72" />
+<edge source="73" target="3" />
+<edge source="66" target="73" />
+<edge source="74" target="36" />
+<edge source="75" target="61" />
+<edge source="76" target="25" />
+<edge source="70" target="76" />
+<edge source="77" target="15" />
+<edge source="77" target="20" />
+<edge source="8" target="78" />
+<edge source="24" target="78" />
+<edge source="5" target="79" />
+<edge source="8" target="80" />
+<edge source="33" target="80" />
+<edge source="81" target="26" />
+<edge source="47" target="81" />
+<edge source="22" target="82" />
+<edge source="83" target="8" />
+<edge source="48" target="83" />
+<edge source="77" target="83" />
+<edge source="84" target="46" />
+<edge source="45" target="85" />
+<edge source="0" target="86" />
+<edge source="41" target="86" />
+<edge source="86" target="74" />
+<edge source="10" target="87" />
+<edge source="87" target="64" />
+<edge source="3" target="88" />
+<edge source="23" target="89" />
+<edge source="31" target="90" />
+<edge source="91" target="7" />
+<edge source="91" target="9" />
+<edge source="92" target="34" />
+<edge source="47" target="93" />
+<edge source="94" target="31" />
+<edge source="95" target="16" />
+<edge source="77" target="95" />
+<edge source="96" target="46" />
+<edge source="64" target="96" />
+<edge source="96" target="69" />
+<edge source="0" target="97" />
+<edge source="97" target="80" />
+<edge source="1" target="98" />
+<edge source="99" target="40" />
+<edge source="64" target="100" />
+<edge source="68" target="100" />
+<edge source="101" target="64" />
+<edge source="102" target="83" />
+<edge source="103" target="0" />
+<edge source="103" target="23" />
+<edge source="99" target="103" />
+<edge source="104" target="0" />
+<edge source="14" target="104" />
+</graph>
+</graphml>

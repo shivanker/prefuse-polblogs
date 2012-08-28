@@ -219,6 +219,7 @@ public class graphAlpha extends JPanel {
 		display.setSize(1000, 700);
 		display.pan(500, 350);
 		display.zoom(new Point2D.Float(500, 350), 1.5);
+		display.rotate(new Point2D.Float(500, 350), Math.PI/2-0.05);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
 
@@ -408,6 +409,7 @@ public class graphAlpha extends JPanel {
 			}
 		}
 
+		System.out.println(g.getNodeCount());
 		int[] degs = new int[g.getNodeCount()];
 		g.addColumn("degree", int.class);
 		for (int i = 0; i < g.getNodeCount(); ++i) {

@@ -143,7 +143,7 @@ public class graphBeta extends JPanel {
 		fill.add(VisualItem.FIXED, ColorLib.rgba(0, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, fill2);
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
-
+		
 		// use white for node text
 		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));

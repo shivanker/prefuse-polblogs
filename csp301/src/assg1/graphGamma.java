@@ -107,7 +107,8 @@ public class graphGamma extends JPanel {
 		focusGroup.addTupleSetListener(new TupleSetListener() {
 			public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
 				for (int i = 0; i < rem.length; ++i)
-					((VisualItem) rem[i]).setFixed(false);
+					if(rem[i] instanceof NodeItem && ((NodeItem)rem[i]).getInt("size") < 100)
+						((VisualItem) rem[i]).setFixed(false);
 
 				for (int i = 0; i < add.length; ++i) {
 					((VisualItem) add[i]).setFixed(false);
@@ -123,21 +124,22 @@ public class graphGamma extends JPanel {
 			}
 		});
 
+
 		// --------------------------------------------------------------------
 		// create actions to process the visual data
 		int hops = 30;
 		final GraphDistanceFilter filter = new GraphDistanceFilter(graph, hops);
 
 		// color set for default node
-		int[] palette = new int[] { ColorLib.rgba(255, 200, 200, 250),
+		int[] palette = new int[] { ColorLib.rgba(200, 200, 255, 250),
 				ColorLib.rgba(200, 255, 200, 250),
 				ColorLib.rgba(255, 200, 125, 250),
-				ColorLib.rgba(200, 200, 255, 250) };
+				ColorLib.rgba(255, 200, 200, 250) };
 		// color set for highlighted node
-		int[] palette2 = new int[] { ColorLib.rgba(255, 20, 147, 200),
+		int[] palette2 = new int[] { ColorLib.rgba(0, 0, 128, 200),
 				ColorLib.rgba(0, 128, 0, 200),
 				ColorLib.rgba(225, 150, 100, 200),
-				ColorLib.rgba(0, 0, 128, 200) };
+				ColorLib.rgba(255, 20, 147, 200) };
 
 		// map nominal data values to colors using our provided palette
 		DataColorAction fill = new DataColorAction(nodes, "size",
@@ -147,7 +149,7 @@ public class graphGamma extends JPanel {
 		fill.add(VisualItem.FIXED, ColorLib.rgba(0, 0, 0, 200));
 		fill.add(VisualItem.HIGHLIGHT, fill2);
 		fill.add("ingroup('_search_')", ColorLib.rgba(0, 0, 0, 200));
-
+		
 		// use white for node text
 		ColorAction text = new ColorAction(nodes, VisualItem.TEXTCOLOR,
 				ColorLib.gray(0));
@@ -207,11 +209,10 @@ public class graphGamma extends JPanel {
 		color.add(text);
 		color.add(edge);
 		color.add(edge1);
-		// color.add(edge2);
 		color.add(nStroke);
 		color.add(new RepaintAction());
 
-		ActionList animate = new ActionList(Activity.INFINITY);
+		ActionList animate = new ActionList(20000);
 		animate.add(new ForceDirectedLayout(graph, fsim, false));
 		animate.add(new RepaintAction());
 
@@ -228,7 +229,6 @@ public class graphGamma extends JPanel {
 		Display display = new Display(m_vis);
 		display.setSize(1000, 700);
 		display.pan(500, 350);
-		// display.setBackgroundImage(img, true, true);
 		display.zoom(new Point2D.Float(500, 350), 1.1);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
@@ -445,7 +445,7 @@ public class graphGamma extends JPanel {
 			double y = item.getY();
 			if (Double.isNaN(y) || Double.isInfinite(y))
 				y = 0;
-			double width = getBaseSize() * item.getSize();
+			double width =  getBaseSize()*item.getSize();
 
 			if (item instanceof NodeItem) {
 				width += item.getInt("size") * 0.25;
@@ -457,6 +457,8 @@ public class graphGamma extends JPanel {
 				y = y - width / 2;
 			}
 
+//			if(item.getInt("size")>100)
+//				return rectangle(x, y, width, width);
 			return ellipse(x, y, width, width);
 		}
 

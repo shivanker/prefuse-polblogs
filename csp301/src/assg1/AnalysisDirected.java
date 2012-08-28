@@ -75,6 +75,7 @@ public class AnalysisDirected {
 		g.addColumn("explored", boolean.class, false);
 		g.addColumn("exploredRev", boolean.class, false);
 		g.addColumn("leader", int.class);
+		g.addColumn("idNew", int.class);
 		for (int i = g.getNodeCount() - 1; i >= 0; i--)
 			if (!g.getNode(i).getBoolean("exploredRev"))
 				DFSRev(g.getNode(i));
@@ -93,6 +94,7 @@ public class AnalysisDirected {
 		sccG.addColumn("label", String.class);
 		sccG.addColumn("id", int.class);
 
+		// making the scc's as new graphs
 		Graph[] sgs = new Graph[g.getNodeCount()];
 		String[] sgsLabels = new String[g.getNodeCount()];
 		g.addColumn("set", boolean.class, false);
@@ -101,7 +103,7 @@ public class AnalysisDirected {
 			if (g.getNode(i).getInt("leader") == i) {
 				Node I = g.getNode(i);
 
-				sgs[i] = new Graph(false);
+				sgs[i] = new Graph(true);
 				sgs[i].addColumn("id", int.class);
 				sgs[i].addColumn("idOld", int.class);
 				sgs[i].addColumn("label", String.class);
@@ -116,6 +118,8 @@ public class AnalysisDirected {
 				t.set("source", I.getString("source"));
 				t.set("id", 0);
 				t.set("idOld", i);
+				I.set("idNew", 0);
+				
 				sgsLabels[i] = new String(I.getString("label"));
 				I.set("set", true);
 				int c = 0, loop = 0;
@@ -126,18 +130,22 @@ public class AnalysisDirected {
 								.neighbors();
 
 						while (neitr.hasNext()) {
+							
 							Node n = neitr.next();
 							if (n.getInt("leader") != i
 									|| (boolean) n.get("set"))
 								continue;
 							Node temp = sgs[i].addNode();
 							c++;
+							
 							temp.set("id", c);
 							temp.set("idOld", n.getInt("id"));
 							temp.set("value", n.getString("value"));
 							temp.set("leader", n.getInt("leader"));
 							temp.set("label", n.getString("label"));
 							temp.set("source", n.getString("source"));
+							n.set("idNew", c);
+							
 							sgsLabels[i] = new String(sgsLabels[i]
 									+ n.getString("label"));
 							n.set("set", true);
@@ -148,9 +156,24 @@ public class AnalysisDirected {
 						break;
 					}
 				}
-				for (int j = 0; j < sgs[i].getNodeCount(); ++j)
-					for (int k = j + 1; k < sgs[i].getNodeCount(); ++k)
-						sgs[i].addEdge(j, k);
+				
+				// adding the edges
+				Iterator<Node> sgsNodes = sgs[i].nodes();
+				while(sgsNodes.hasNext())	{
+					
+					Node sgSrc = sgsNodes.next();
+					Node oldSrc = g.getNode(sgSrc.getInt("idOld"));
+					
+					Iterator<Node> edges = oldSrc.outNeighbors();
+					
+					while(edges.hasNext())	{
+						
+						Node oldTrg = edges.next();
+						if(oldTrg.getInt("leader") == i)
+							sgs[i].addEdge(sgSrc.getInt("id"), oldTrg.getInt("idNew"));
+						
+					}
+				}
 			}
 
 		int leaderMap[] = new int[g.getNodeCount()], l = 0;
@@ -174,7 +197,6 @@ public class AnalysisDirected {
 		HashSet<Integer> leaders = new HashSet<Integer>();
 		for (int i = 0; i < g.getNodeCount(); ++i)
 			leaders.add(g.getNode(i).getInt("leader"));
-		System.out.println(leaders + "\n" + g.getEdgeCount() + "\n");
 
 		Iterator<Edge> ie = g.edges();
 		while (ie.hasNext()) {
@@ -185,6 +207,7 @@ public class AnalysisDirected {
 				sccG.addEdge(leaderMap[a], leaderMap[b]);
 		}
 
+		
 		Graph sg2 = new Graph(true);
 		sg2.addColumn("subGraph", Graph.class);
 		sg2.addColumn("0", int.class);
@@ -196,8 +219,6 @@ public class AnalysisDirected {
 		int i = 0;
 		while (in.hasNext()) {
 			Node t = in.next();
-			if (t.getInt("size") > 2)
-				System.out.println(t.getInt("size"));
 			if (!t.edges().hasNext())
 				sccG.removeNode(t);
 			else {
