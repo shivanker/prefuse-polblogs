@@ -72,8 +72,184 @@ public class AnalysisDirected {
 	}
 	
 	public static Graph cliques3(Graph g)	{
+		g.addColumn("leader", int.class,-1);
+		g.addColumn("idNew", int.class);
+		g.addColumn("close", HashSet.class, null);
+		for(int i=0; i<g.getNodeCount(); ++i)
+			g.getNode(i).set("close", new HashSet<Node>());
+		Iterator<Node> nodes = g.nodes();
+		while(nodes.hasNext())	{
+			Node temp = nodes.next();
+			Iterator<Node> neighbor = temp.neighbors();
+			while (neighbor.hasNext()) {
+				Node t = neighbor.next();
+				if (temp.getInt("id") < t.getInt("id")) {
+					Set<Node> intersection = new HashSet<Node>((HashSet<Node>) t.get("close"));
+					intersection.retainAll((HashSet<Node>) temp.get("close"));
+					Iterator<Node> i = intersection.iterator();
+					while (i.hasNext() && t.getInt("leader") == -1 && temp.getInt("leader") == -1)
+					{
+						Node c = i.next();
+						if(c.getInt("leader") == -1 && c.getInt("value") == t.getInt("value") && t.getInt("value") == temp.getInt("value") &&  
+								((g.getEdge(temp,t) != null && g.getEdge(t,c) != null && g.getEdge(c,temp) != null) || 
+										(g.getEdge(t,temp) != null && g.getEdge(temp,c) != null && g.getEdge(c,t) != null)))	{
+							t.set("leader", temp.getInt("id"));
+							temp.set("leader", temp.getInt("id"));
+							c.set("leader", temp.getInt("id"));
+						}
+					}
+					((HashSet<Node>) t.get("close")).add(temp);
+				}
+			}
+		}
 		
-		return null;
+		Graph triG = new Graph(true);
+		triG.addColumn("subGraph", Graph.class);
+		triG.addColumn("value", int.class);
+		triG.addColumn("size", int.class);
+		triG.addColumn("label", String.class);
+		triG.addColumn("id", int.class);
+
+		// making the scc's as new graphs
+		Graph[] tcs = new Graph[g.getNodeCount()];
+		String[] tcsLabels = new String[g.getNodeCount()];
+		g.addColumn("set", boolean.class, false);
+
+		for (int i = 0; i < g.getNodeCount(); ++i)
+			if (g.getNode(i).getInt("leader") == -1 || g.getNode(i).getInt("leader") == i) {
+				g.getNode(i).set("leader", i);
+				
+				Node I = g.getNode(i);
+
+				tcs[i] = new Graph(true);
+				tcs[i].addColumn("id", int.class);
+				tcs[i].addColumn("idOld", int.class);
+				tcs[i].addColumn("label", String.class);
+				tcs[i].addColumn("value", int.class);
+				tcs[i].addColumn("source", String.class);
+				tcs[i].addColumn("leader", int.class);
+
+				Node t = tcs[i].addNode();
+				t.set("value", I.getInt("value"));
+				t.set("leader", I.getInt("leader"));
+				t.set("label", I.getString("label"));
+				t.set("source", I.getString("source"));
+				t.set("id", 0);
+				t.set("idOld", i);
+				I.set("idNew", 0);
+				
+				tcsLabels[i] = new String(I.getString("label"));
+				I.set("set", true);
+				int c = 0, loop = 0;
+				while (true) {
+					try {
+						Iterator<Node> neitr = g.getNode(
+								tcs[i].getNode(loop).getInt("idOld"))
+								.neighbors();
+
+						while (neitr.hasNext()) {
+							
+							Node n = neitr.next();
+							if (n.getInt("leader") != i
+									|| (boolean) n.get("set"))
+								continue;
+							Node temp = tcs[i].addNode();
+							c++;
+							
+							temp.set("id", c);
+							temp.set("idOld", n.getInt("id"));
+							temp.set("value", n.getString("value"));
+							temp.set("leader", n.getInt("leader"));
+							temp.set("label", n.getString("label"));
+							temp.set("source", n.getString("source"));
+							n.set("idNew", c);
+							
+							tcsLabels[i] = new String(tcsLabels[i]
+									+ " " + n.getString("label"));
+							n.set("set", true);
+						}
+
+						loop++;
+					} catch (Exception e) {
+						break;
+					}
+				}
+				
+				// adding the edges
+				Iterator<Node> tcsNodes = tcs[i].nodes();
+				while(tcsNodes.hasNext())	{
+					
+					Node tcSrc = tcsNodes.next();
+					Node oldSrc = g.getNode(tcSrc.getInt("idOld"));
+					
+					Iterator<Node> edges = oldSrc.outNeighbors();
+					
+					while(edges.hasNext())	{
+						
+						Node oldTrg = edges.next();
+						if(oldTrg.getInt("leader") == i)
+							tcs[i].addEdge(tcSrc.getInt("id"), oldTrg.getInt("idNew"));
+						
+					}
+				}
+			}
+
+		int leaderMap[] = new int[g.getNodeCount()], l = 0;
+		for (int i = 0; i < g.getNodeCount(); ++i)
+			if (tcs[i] != null) {
+				leaderMap[i] = l;
+				Node tn = triG.addNode();
+				tn.set("subGraph", tcs[i]);
+				tn.set("id", l++);
+				tn.set("size", tcs[i].getNodeCount());
+				tn.set("value", tcs[i].getNode(0).getInt("value"));
+				tn.set("label", tcsLabels[i]);
+			}
+
+		HashSet<Integer> leaders = new HashSet<Integer>();
+		for (int i = 0; i < g.getNodeCount(); ++i)
+			leaders.add(g.getNode(i).getInt("leader"));
+
+		Iterator<Edge> ie = g.edges();
+		while (ie.hasNext()) {
+			Edge t = ie.next();
+			int a = g.getNode(t.getInt("source")).getInt("leader"), b = g.getNode(t.getInt("target")).getInt("leader");
+			if (a != b)
+				triG.addEdge(leaderMap[a], leaderMap[b]);
+		}
+		
+		Graph tg2 = new Graph(true);
+		tg2.addColumn("subGraph", Graph.class);
+		tg2.addColumn("value", int.class);
+		tg2.addColumn("size", int.class);
+		tg2.addColumn("label", String.class);
+		tg2.addColumn("id", int.class);
+		Iterator<Node> in = triG.nodes();
+		int i = 0;
+		while (in.hasNext()) {
+			Node t = in.next();
+			if (!t.edges().hasNext())
+				triG.removeNode(t);
+			else {
+				Node u = tg2.addNode();
+				u.set("subGraph", t.get("subGraph"));
+				u.set("value", t.getInt("value"));
+				u.set("size", t.get("size"));
+				u.set("label", t.get("label"));
+				u.set("id", i);
+				t.set("id", i++);
+			}
+		}
+
+		Iterator<Edge> ed = triG.edges();
+		while (ed.hasNext()) {
+			Edge a = ed.next();
+			tg2.addEdge(a.getSourceNode().getInt("id"), a.getTargetNode()
+					.getInt("id"));
+		}
+
+		return tg2;
+
 	}
 
 	public static Graph setSCC(Graph g) {
@@ -152,7 +328,7 @@ public class AnalysisDirected {
 							n.set("idNew", c);
 							
 							sgsLabels[i] = new String(sgsLabels[i]
-									+ n.getString("label"));
+									+ " " + n.getString("label"));
 							n.set("set", true);
 						}
 

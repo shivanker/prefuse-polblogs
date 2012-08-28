@@ -35,6 +35,7 @@ import prefuse.action.assignment.DataColorAction;
 import prefuse.action.filter.GraphDistanceFilter;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
+import prefuse.controls.Control;
 import prefuse.controls.ControlAdapter;
 import prefuse.controls.DragControl;
 import prefuse.controls.FocusControl;
@@ -73,7 +74,7 @@ import prefuse.visual.NodeItem;
 import prefuse.visual.VisualGraph;
 import prefuse.visual.VisualItem;
 
-public class graphAlpha extends JPanel {
+public class graphDelta extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final String graph = "graph";
@@ -83,7 +84,7 @@ public class graphAlpha extends JPanel {
 
 	private Visualization m_vis;
 
-	public graphAlpha(Graph g, String label) {
+	public graphDelta(Graph g, String label) {
 		super(new BorderLayout());
 
 		// create a new, empty visualization for our data
@@ -219,7 +220,6 @@ public class graphAlpha extends JPanel {
 		display.setSize(1000, 700);
 		display.pan(500, 350);
 		display.zoom(new Point2D.Float(500, 350), 1.5);
-		display.rotate(new Point2D.Float(500, 350), Math.PI/2-0.05);
 		display.setForeground(Color.GRAY);
 		display.setBackground(Color.white);
 
@@ -231,7 +231,8 @@ public class graphAlpha extends JPanel {
 		display.addControlListener(new WheelZoomControl());
 		display.addControlListener(new ZoomToFitControl());
 		display.addControlListener(new NeighborHighlightControl());
-		display.addControlListener(new ToolTipControl(new String[] { "label" }));
+		display.addControlListener(new modToolTip());
+		display.addControlListener(new sccOpener());
 
 		// overview display
 		Display overview = new Display(m_vis);
@@ -300,16 +301,28 @@ public class graphAlpha extends JPanel {
 		display.addControlListener(new ControlAdapter() {
 			public void itemEntered(VisualItem item, MouseEvent e) {
 				if (item instanceof NodeItem) {
-					String label = item.getString("label");
-					String aff = "" + item.get("value");
-					String source = "" + item.get("source");
-					if (aff.equals("1"))
-						aff = "Conservative";
-					else
-						aff = "Liberal";
-					title.setText(label);
-					value.setText("Affiliation: " + aff);
-					value2.setText("Source: " + source);
+					if (item.getInt("size") == 1) {
+						String label = item.getString("label");
+						String aff = "" + item.get("value");
+						String source = "" + ((Graph)item.get("subGraph")).getNode(0).getString("source");
+						if (aff.equals("1"))
+							aff = "Conservative";
+						else
+							aff = "Liberal";
+						title.setText(label);
+						value.setText("Affiliation: " + aff);
+						value2.setText("Source: " + source);
+					}
+					else	{
+						String aff = "" + item.get("value");
+						if (aff.equals("1"))
+							aff = "Conservative";
+						else
+							aff = "Liberal";
+						String click = "Click to visualise.";
+						title.setText("A " + aff + " 3-Clique.");
+						value.setText(click);
+					}
 				} else
 					title.setText(":O");
 			}
@@ -364,7 +377,7 @@ public class graphAlpha extends JPanel {
 	public static void main(String[] args) {
 		UILib.setPlatformLookAndFeel();
 
-		// create graphAlpha
+		// create graphDelta
 		String datafile = "polblogs.xml";
 		String label = "label";
 		if (args.length > 1) {
@@ -390,10 +403,22 @@ public class graphAlpha extends JPanel {
 			System.exit(1);
 		}
 
+		if (!g.getNode(0).canGetInt("id")) {
+			g.addColumn("id", int.class);
+			@SuppressWarnings("unchecked")
+			Iterator<Node> n = g.nodes();
+			int i = 0;
+			while (n.hasNext()) {
+				n.next().set("id", i++);
+			}
+		}
+
 		return demo(g, label);
 	}
 
 	public static JFrame demo(Graph g, String label) {
+
+		g = AnalysisDirected.cliques3(g);
 
 		if (!g.getNode(0).canGetInt("id")) {
 			g.addColumn("id", int.class);
@@ -413,7 +438,7 @@ public class graphAlpha extends JPanel {
 		}
 		degreeMedian = Statistics.median(degs, 0, degs.length - 1);
 
-		final graphAlpha view = new graphAlpha(g, label);
+		final graphDelta view = new graphDelta(g, label);
 
 		// launch window
 		JFrame frame = new JFrame(
@@ -473,10 +498,47 @@ public class graphAlpha extends JPanel {
 				x = x - width / 2;
 				y = y - width / 2;
 			}
+			
+			if(item.getInt("size") == 1)
+				return ellipse(x, y, width, width);
+			
+			width *= 2;
+			if(item.getInt("value") == 0)
+				return triangle_left((float)x, (float)y, (float)width);
+			return triangle_right((float)x, (float)y, (float)width);
+		}
+		
+	}
+	
+	class sccOpener extends ControlAdapter implements Control {
 
-			return ellipse(x, y, width, width);
+		public void itemClicked(VisualItem item, MouseEvent e) {
+			if (item instanceof NodeItem)
+				graphAlpha.demo((Graph) item.get("subGraph"), "label");
 		}
 
 	}
+	
+	class modToolTip extends ToolTipControl {
+
+		public modToolTip() {
+			super(new String[0]);
+		}
+
+		public modToolTip(String field) {
+			super(field);
+		}
+
+		@Override
+		public void itemEntered(VisualItem item, MouseEvent e) {
+			Display d = (Display) e.getSource();
+			if (item.canGetString("size"))
+				if(item.getInt("size") == 1)
+					d.setToolTipText(item.getString("label"));
+				else
+					d.setToolTipText("3-Clique comprising of " + item.getString("label").replace(" ", ", "));
+		}
+	}
+
 
 }

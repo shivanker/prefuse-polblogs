@@ -107,23 +107,18 @@ public class graphGamma extends JPanel {
 		focusGroup.addTupleSetListener(new TupleSetListener() {
 			public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
 				for (int i = 0; i < rem.length; ++i)
-					if(rem[i] instanceof NodeItem && ((NodeItem)rem[i]).getInt("size") < 100)
-						((VisualItem) rem[i]).setFixed(false);
-
+					((VisualItem) rem[i]).setFixed(false);
 				for (int i = 0; i < add.length; ++i) {
 					((VisualItem) add[i]).setFixed(false);
 					((VisualItem) add[i]).setFixed(true);
 				}
-
 				if (ts.getTupleCount() == 0) {
 					ts.addTuple(rem[0]);
 					((VisualItem) rem[0]).setFixed(false);
 				}
-
 				m_vis.run("draw");
 			}
 		});
-
 
 		// --------------------------------------------------------------------
 		// create actions to process the visual data
