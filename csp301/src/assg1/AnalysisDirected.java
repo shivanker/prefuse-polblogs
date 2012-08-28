@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.Stack;
 
@@ -524,6 +525,36 @@ public class AnalysisDirected {
 				sameEdge++;
 		}
 		return sameEdge;
+	}
+	
+	public static int BFSheight(Graph g, int v)	{
+
+		g.addColumn(v+"dist", int.class, -1);
+		LinkedList<Node> q = new LinkedList<Node>();
+		q.add(g.getNode(v));
+		q.peekFirst().set(v+"dist", 0);
+		int max = 0;
+		while(!q.isEmpty())	{
+			Node t = q.removeFirst();
+			Iterator<Node> nei = t.outNeighbors();
+			while(nei.hasNext())	{
+				Node temp = nei.next();
+				if(temp.getInt(v+"dist") == -1)	{
+					int d = t.getInt(v+"dist") + 1;
+					max = Math.max(d, max);
+					temp.set(v+"dist", d);
+					q.addLast(temp);
+				}
+			}
+		}
+		return max;
+	}
+	
+	public static int dia(Graph g)	{
+		int max = 0;
+		for(int i=0; i<g.getNodeCount(); ++i)
+			max = Math.max(max, BFSheight(g,i));
+		return max;
 	}
 
 	public static void main(String... args) throws DataIOException, IOException {

@@ -85,7 +85,7 @@ public class graphBeta extends JPanel {
 
 	public graphBeta(Graph g, String label) {
 		super(new BorderLayout());
-
+		
 		// create a new, empty visualization for our data
 		m_vis = new Visualization();
 
