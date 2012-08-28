@@ -70,6 +70,11 @@ public class AnalysisDirected {
 		}
 		return tb;
 	}
+	
+	public static Graph cliques3(Graph g)	{
+		
+		return null;
+	}
 
 	public static Graph setSCC(Graph g) {
 		g.addColumn("explored", boolean.class, false);
