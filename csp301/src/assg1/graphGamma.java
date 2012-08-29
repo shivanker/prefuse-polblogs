@@ -440,10 +440,15 @@ public class graphGamma extends JPanel {
 			double y = item.getY();
 			if (Double.isNaN(y) || Double.isInfinite(y))
 				y = 0;
-			double width =  getBaseSize()*item.getSize();
+			double width =  getBaseSize()*item.getSize()*1.75;
 
 			if (item instanceof NodeItem) {
-				width += item.getInt("size") * 0.25;
+				if(item.getInt("size") == 2)
+					width *= item.getInt("size");
+				else if(item.getInt("size") == 3)
+					width *= item.getInt("size");
+				else
+					width += item.getInt("size") * 0.35;
 			}
 
 			// Center the shape around the specified x and y
