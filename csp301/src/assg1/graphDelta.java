@@ -442,7 +442,7 @@ public class graphDelta extends JPanel {
 
 		// launch window
 		JFrame frame = new JFrame(
-				"c s p 3 0 1  |  a s s i g n m e n t 1 | p o l b l o g s");
+				"c s p 3 0 1  |  a s s i g n m e n t 1 | c l i q u e s");
 		frame.setContentPane(view);
 		frame.pack();
 		frame.setVisible(true);
